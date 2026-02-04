@@ -1,0 +1,72 @@
+# ===========================================
+# Witmind Caddyfile
+# ===========================================
+# Caddy reverse proxy configuration
+# Auto SSL via Let's Encrypt
+# ===========================================
+
+# Global settings
+{
+    email admin@witmind.ai
+}
+
+# ===========================================
+# Mission Control Dashboard
+# ===========================================
+mc.{$DOMAIN:localhost} {
+    # Basic auth (optional - set MC_BASIC_AUTH_* env vars)
+    @auth {
+        expression {env.MC_BASIC_AUTH_USER} != ""
+    }
+    basicauth @auth {
+        {env.MC_BASIC_AUTH_USER} {env.MC_BASIC_AUTH_PASS_HASH}
+    }
+
+    reverse_proxy mc-frontend:80
+}
+
+# ===========================================
+# Mission Control API
+# ===========================================
+api.{$DOMAIN:localhost} {
+    # Basic auth (optional)
+    @auth {
+        expression {env.MC_BASIC_AUTH_USER} != ""
+    }
+    basicauth @auth {
+        {env.MC_BASIC_AUTH_USER} {env.MC_BASIC_AUTH_PASS_HASH}
+    }
+
+    reverse_proxy mc-backend:4000
+}
+
+# ===========================================
+# Git Server
+# ===========================================
+git.{$DOMAIN:localhost} {
+    reverse_proxy gitea:3000
+}
+
+# ===========================================
+# VS Code Server (if running on host)
+# ===========================================
+code.{$DOMAIN:localhost} {
+    reverse_proxy host.docker.internal:8080
+}
+
+# ===========================================
+# Local Development (no SSL)
+# ===========================================
+:80 {
+    respond /health 200
+
+    # API
+    handle /api/* {
+        reverse_proxy mc-backend:4000
+    }
+
+    # Frontend
+    handle {
+        reverse_proxy mc-frontend:80
+    }
+}

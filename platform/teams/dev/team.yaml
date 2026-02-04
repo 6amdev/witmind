@@ -1,0 +1,25 @@
+id: dev
+name: Development Team
+description: Software development agents for coding, testing, and deployment
+
+lead: pm_agent
+
+agents:
+  - pm_agent
+  - tech_lead
+  - frontend_dev
+  - backend_dev
+  - fullstack_dev
+  - mobile_dev
+  - qa_engineer
+  - security_analyst
+  - devops_engineer
+
+workflow:
+  - pm_agent       # Plan and break down tasks
+  - tech_lead      # Architecture decisions
+  - frontend_dev   # Frontend implementation
+  - backend_dev    # Backend implementation
+  - qa_engineer    # Testing
+  - security_analyst  # Security review
+  - devops_engineer   # Deployment

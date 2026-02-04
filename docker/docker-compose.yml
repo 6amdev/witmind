@@ -1,0 +1,134 @@
+version: '3.8'
+
+# ===========================================
+# Witmind Docker Compose
+# ===========================================
+# Usage:
+#   docker compose up -d           # Start all
+#   docker compose logs -f         # View logs
+#   docker compose down            # Stop all
+# ===========================================
+
+services:
+  # ===========================================
+  # Reverse Proxy
+  # ===========================================
+  caddy:
+    image: caddy:2-alpine
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - backend
+
+  # ===========================================
+  # Mission Control Backend
+  # ===========================================
+  mc-backend:
+    build:
+      context: ../mission-control/backend
+      dockerfile: Dockerfile
+    container_name: mc-backend
+    restart: unless-stopped
+    environment:
+      - MONGODB_URI=${MONGODB_URI:-mongodb://mongodb:27017/witmind}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - backend
+
+  # ===========================================
+  # Mission Control Frontend
+  # ===========================================
+  mc-frontend:
+    build:
+      context: ../mission-control/frontend
+      dockerfile: Dockerfile
+    container_name: mc-frontend
+    restart: unless-stopped
+    networks:
+      - backend
+
+  # ===========================================
+  # Database
+  # ===========================================
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    restart: unless-stopped
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - backend
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend
+
+  # ===========================================
+  # Git Server
+  # ===========================================
+  gitea:
+    image: gitea/gitea:latest
+    container_name: gitea
+    restart: unless-stopped
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+    volumes:
+      - gitea_data:/data
+    networks:
+      - backend
+
+  # ===========================================
+  # Local LLM (Optional)
+  # ===========================================
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+    # Uncomment for GPU support:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+    networks:
+      - backend
+
+# ===========================================
+# Networks
+# ===========================================
+networks:
+  backend:
+    name: backend
+    driver: bridge
+
+# ===========================================
+# Volumes
+# ===========================================
+volumes:
+  caddy_data:
+  caddy_config:
+  mongodb_data:
+  redis_data:
+  gitea_data:
+  ollama_data:
