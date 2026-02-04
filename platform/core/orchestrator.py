@@ -14,9 +14,9 @@ from typing import Dict, List, Optional
 from dataclasses import dataclass
 from enum import Enum
 
-from task_queue import TaskQueue
-from llm_router import LLMRouter
-from agent_runner import AgentRunner
+from .task_queue import TaskQueue
+from .llm_router import LLMRouter
+from .agent_runner import AgentRunner
 
 # Setup logging
 logging.basicConfig(

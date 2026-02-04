@@ -8,6 +8,7 @@ import json
 import subprocess
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional, List
+from enum import Enum
 from pathlib import Path
 import requests
 
@@ -452,3 +453,9 @@ if __name__ == "__main__":
             print(f"Response: {result['response'][:100]}...")
         else:
             print(f"Error: {result['error']}")
+
+# Task Complexity Enum
+class TaskComplexity(Enum):
+    LOW = 'low'
+    MEDIUM = 'medium'
+    HIGH = 'high'

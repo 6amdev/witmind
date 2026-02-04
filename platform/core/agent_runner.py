@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Dict, Optional, Callable
 from datetime import datetime
 
-from llm_router import LLMRouter, TaskComplexity
+from .llm_router import LLMRouter, TaskComplexity
 
 logger = logging.getLogger('agent_runner')
 
