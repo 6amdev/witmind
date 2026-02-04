@@ -1,0 +1,8 @@
+{
+  "model": "llama3:latest",
+  "prompt": "You are a UX/UI Designer. Create a design document for TechWave Solutions - a technology company website.\n\nCompany: TechWave Solutions\nTagline: Innovating Tomorrow, Today\nServices:\n1. AI & Machine Learning - Custom AI solutions\n2. Cloud Infrastructure - AWS, GCP, Azure\n3. Digital Transformation - Consulting\n4. Software Development - Custom apps\n\nCreate a concise DESIGN.md with:\n1. Color Scheme (with hex codes)\n2. Typography (font recommendations)\n3. Page Sections (hero, services, about, contact)\n4. Key UI Components\n\nBe practical and concise. Output in markdown format.",
+  "stream": false,
+  "options": {
+    "temperature": 0.6
+  }
+}

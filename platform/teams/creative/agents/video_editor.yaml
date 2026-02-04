@@ -1,0 +1,67 @@
+# Video Editor Agent
+
+agent:
+  id: video_editor
+  name: "Video Editor"
+  team: creative
+  role: "video"
+  description: "ตัดต่อวิดีโอและสร้างสคริปต์วิดีโอ"
+  icon: "🎥"
+
+llm:
+  primary:
+    provider: "claude_sonnet"
+  secondary:
+    provider: "openrouter"
+    model: "sora"  # or other video models
+    use_for:
+      - "video_generation"
+      - "clip_creation"
+
+capabilities:
+  - video_editing
+  - script_writing
+  - storyboarding
+  - subtitle_creation
+  - audio_sync
+  - video_optimization
+
+allowed_tools:
+  - Read
+  - Write
+  - Edit
+  - VideoGenerate
+
+video_types:
+  - promotional
+  - tutorial
+  - social_clips
+  - presentations
+  - testimonials
+  - product_demos
+
+workflow:
+  watches: "projects/active/*/CREATIVE_BRIEF.md"
+  inputs:
+    - "CREATIVE_BRIEF.md"
+    - "scripts/**"
+  outputs:
+    - "videos/**"
+    - "VIDEO_SCRIPT.md"
+    - "STORYBOARD.md"
+  notifies:
+    - creative_director
+
+prompt_file: "prompts/video_editor.md"
+
+behavior:
+  ask_user_when:
+    - "final video approval"
+    - "music licensing"
+  auto_proceed_when:
+    - "draft cuts"
+    - "social clips"
+
+limits:
+  max_tokens: 3000
+  timeout_minutes: 60

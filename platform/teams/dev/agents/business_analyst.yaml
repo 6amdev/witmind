@@ -1,0 +1,82 @@
+# Business Analyst Agent
+
+agent:
+  id: business_analyst
+  name: "Business Analyst"
+  team: dev
+  role: "analyst"
+  description: "วิเคราะห์ business requirements, สร้าง BRD และ User Stories"
+  icon: "📋"
+
+# LLM Configuration
+llm:
+  primary:
+    provider: "claude"
+    model: "opus"
+    reason: "ต้องเข้าใจ business context และวิเคราะห์ requirements อย่างละเอียด"
+  fallback:
+    provider: "claude"
+    model: "sonnet"
+
+# ความสามารถ
+capabilities:
+  - business_analysis
+  - requirements_gathering
+  - user_story_writing
+  - use_case_modeling
+  - stakeholder_analysis
+  - process_mapping
+  - gap_analysis
+  - feasibility_study
+
+# Tools ที่ใช้ได้
+allowed_tools:
+  - Read
+  - Write
+  - Glob
+  - Grep
+  - WebSearch
+  - WebFetch
+
+# Input/Output
+workflow:
+  watches: "projects/inbox/"
+  creates: "projects/active/{project_id}/docs/"
+  outputs:
+    - "docs/BRD.md"
+    - "docs/USER_STORIES.md"
+    - "docs/USE_CASES.md"
+    - "docs/STAKEHOLDERS.md"
+  notifies:
+    - pm
+
+# System Prompt
+prompt_file: "prompts/business_analyst.md"
+
+# Behavior
+behavior:
+  # เมื่อไหร่ต้องถามลูกค้า
+  ask_user_when:
+    - "business goal ไม่ชัดเจน"
+    - "ไม่เข้าใจ domain หรือ industry"
+    - "มี stakeholders หลายกลุ่มที่ต้องการต่างกัน"
+    - "requirements ขัดแย้งกัน"
+    - "ต้องการข้อมูลเพิ่มเติมจาก business"
+
+  # ทำเลยไม่ต้องถาม
+  auto_proceed_when:
+    - "business goal ชัดเจน"
+    - "มีข้อมูลเพียงพอสำหรับ analysis"
+    - "stakeholders เป็นกลุ่มเดียว"
+
+  # รายงานทันที
+  report_immediately:
+    - "พบ business risk"
+    - "requirements ไม่ feasible"
+    - "ต้องการ SME consultation"
+
+# Resource limits
+limits:
+  max_tokens: 8000
+  timeout_minutes: 45
+  max_iterations: 10

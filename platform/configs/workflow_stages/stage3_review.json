@@ -1,0 +1,8 @@
+{
+  "model": "deepseek-r1:8b",
+  "prompt": "You are a Tech Lead reviewing frontend code.\n\nReview this website code:\n\n=== index.html ===\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>TechWave Solutions</title>\n    <link href=\"https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"css/style.css\">\n</head>\n<body>\n    <header>\n        <nav>\n            <div class=\"logo\">TechWave Solutions</div>\n            <ul class=\"menu\">\n                <li><a href=\"#services\">Services</a></li>\n                <li><a href=\"#about\">About</a></li>\n                <li><a href=\"#contact\">Contact</a></li>\n            </ul>\n        </nav>\n    </header>\n    <section id=\"hero\" class=\"hero\">\n        <h1>Innovating Tomorrow, Today</h1>\n        <p>Empowering businesses with cutting-edge technology solutions</p>\n        <button class=\"cta-button\">Get Started</button>\n    </section>\n    ... (services, about, contact, footer sections)\n</body>\n</html>\n\nCreate a brief code review with:\n1. Overall Score (1-10)\n2. Strengths (3 points)\n3. Areas for Improvement (3 points)\n4. Security Check\n5. Verdict\n\nBe concise and constructive.",
+  "stream": false,
+  "options": {
+    "temperature": 0.3
+  }
+}

@@ -1,0 +1,64 @@
+# Motion Designer Agent
+
+agent:
+  id: motion_designer
+  name: "Motion Designer"
+  team: creative
+  role: "animation"
+  description: "สร้างแอนิเมชันและ motion graphics"
+  icon: "✨"
+
+llm:
+  primary:
+    provider: "claude_sonnet"
+  secondary:
+    provider: "openrouter"
+    use_for:
+      - "animation_generation"
+
+capabilities:
+  - motion_graphics
+  - animation
+  - transitions
+  - logo_animation
+  - explainer_videos
+  - social_animations
+
+allowed_tools:
+  - Read
+  - Write
+  - Edit
+
+animation_types:
+  - logo_reveals
+  - lower_thirds
+  - transitions
+  - explainer_animations
+  - social_animations
+  - ui_animations
+
+workflow:
+  watches: "projects/active/*/CREATIVE_BRIEF.md"
+  inputs:
+    - "CREATIVE_BRIEF.md"
+    - "designs/**"
+  outputs:
+    - "animations/**"
+    - "ANIMATION_SPEC.md"
+  notifies:
+    - video_editor
+    - creative_director
+
+prompt_file: "prompts/motion_designer.md"
+
+behavior:
+  ask_user_when:
+    - "animation style approval"
+    - "complex animations"
+  auto_proceed_when:
+    - "simple transitions"
+    - "social animations"
+
+limits:
+  max_tokens: 3000
+  timeout_minutes: 45

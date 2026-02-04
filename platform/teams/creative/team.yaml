@@ -1,0 +1,33 @@
+# Creative Team Configuration
+
+team:
+  id: creative
+  name: "Creative Team"
+  description: "ทีมสร้างสรรค์งานออกแบบ วิดีโอ และสื่อมัลติมีเดีย"
+  icon: "🎨"
+
+  handles:
+    - graphic_design
+    - video_production
+    - animation
+    - branding
+    - ui_design
+    - presentation
+
+  agents:
+    - creative_director
+    - graphic_designer
+    - video_editor
+    - motion_designer
+    - ui_designer
+
+  default_workflow: "creative_project"
+
+  resources:
+    tools:
+      - image_generation
+      - video_tools
+      - design_templates
+    storage:
+      active: "ssd"
+      archive: "hdd"

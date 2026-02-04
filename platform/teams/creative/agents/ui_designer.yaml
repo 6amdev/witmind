@@ -1,0 +1,69 @@
+# UI Designer Agent
+
+agent:
+  id: ui_designer
+  name: "UI Designer"
+  team: creative
+  role: "interface"
+  description: "ออกแบบ User Interface สำหรับเว็บและแอป"
+  icon: "📐"
+
+llm:
+  primary:
+    provider: "claude_sonnet"
+  secondary:
+    provider: "openrouter"
+    model: "flux"
+    use_for:
+      - "mockup_generation"
+      - "ui_previews"
+
+capabilities:
+  - ui_design
+  - wireframing
+  - prototyping
+  - design_system
+  - responsive_design
+  - accessibility
+
+allowed_tools:
+  - Read
+  - Write
+  - Edit
+  - ImageGenerate
+
+deliverables:
+  - wireframes
+  - mockups
+  - prototypes
+  - design_systems
+  - component_libraries
+  - style_guides
+
+workflow:
+  watches: "projects/active/*/ARCHITECTURE.md"
+  inputs:
+    - "ARCHITECTURE.md"
+    - "SPEC.md"
+    - "brand_guidelines.md"
+  outputs:
+    - "ui/**"
+    - "UI_DESIGN.md"
+    - "DESIGN_SYSTEM.md"
+  notifies:
+    - frontend_dev
+    - creative_director
+
+prompt_file: "prompts/ui_designer.md"
+
+behavior:
+  ask_user_when:
+    - "major ui decisions"
+    - "design system changes"
+  auto_proceed_when:
+    - "component designs"
+    - "responsive variants"
+
+limits:
+  max_tokens: 4000
+  timeout_minutes: 45

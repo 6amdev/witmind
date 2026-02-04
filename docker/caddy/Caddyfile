@@ -1,72 +1,100 @@
-# ===========================================
-# Witmind Caddyfile
-# ===========================================
-# Caddy reverse proxy configuration
-# Auto SSL via Let's Encrypt
-# ===========================================
+# =============================================================
+# Caddy Reverse Proxy - 6AMDev
+# SSL certificates obtained automatically via Let's Encrypt
+# =============================================================
 
-# Global settings
 {
-    email admin@witmind.ai
+    email admin@6amdev.com
 }
 
-# ===========================================
-# Mission Control Dashboard
-# ===========================================
-mc.{$DOMAIN:localhost} {
-    # Basic auth (optional - set MC_BASIC_AUTH_* env vars)
-    @auth {
-        expression {env.MC_BASIC_AUTH_USER} != ""
-    }
-    basicauth @auth {
-        {env.MC_BASIC_AUTH_USER} {env.MC_BASIC_AUTH_PASS_HASH}
-    }
-
-    reverse_proxy mc-frontend:80
+# =============================================================
+# VS Code (code-server) - runs on host, not in Docker
+# =============================================================
+code.6amdev.com {
+    reverse_proxy 192.168.80.203:8080
 }
 
-# ===========================================
-# Mission Control API
-# ===========================================
-api.{$DOMAIN:localhost} {
-    # Basic auth (optional)
-    @auth {
-        expression {env.MC_BASIC_AUTH_USER} != ""
+# =============================================================
+# Mission Control (mc2-frontend container) - Protected
+# =============================================================
+mc.6amdev.com {
+    basicauth {
+        wit $2a$14$bqvt4XdI/ye8Sod1Zo8FsOaR7EADh75jXZ17PO18xXXdDKpVNssm.
     }
-    basicauth @auth {
-        {env.MC_BASIC_AUTH_USER} {env.MC_BASIC_AUTH_PASS_HASH}
-    }
-
-    reverse_proxy mc-backend:4000
+    reverse_proxy mc2-frontend:80
 }
 
-# ===========================================
-# Git Server
-# ===========================================
-git.{$DOMAIN:localhost} {
+# =============================================================
+# Gitea (gitea container)
+# =============================================================
+git.6amdev.com {
     reverse_proxy gitea:3000
 }
 
-# ===========================================
-# VS Code Server (if running on host)
-# ===========================================
-code.{$DOMAIN:localhost} {
-    reverse_proxy host.docker.internal:8080
+# =============================================================
+# Platform API (mc2-backend container) - Protected
+# =============================================================
+api.6amdev.com {
+    basicauth {
+        wit $2a$14$bqvt4XdI/ye8Sod1Zo8FsOaR7EADh75jXZ17PO18xXXdDKpVNssm.
+    }
+    reverse_proxy mc2-backend:4000
 }
 
-# ===========================================
-# Local Development (no SSL)
-# ===========================================
+# =============================================================
+# Dev Projects Landing Page
+# =============================================================
+dev.6amdev.com {
+    respond <<HTML
+<!DOCTYPE html>
+<html>
+<head>
+    <title>6AMDev Projects</title>
+    <style>
+        body { font-family: system-ui; background: #0f172a; color: #e2e8f0; padding: 40px; max-width: 1200px; margin: 0 auto; }
+        h1 { color: #38bdf8; margin-bottom: 10px; }
+        .subtitle { color: #64748b; margin-bottom: 30px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .card { background: #1e293b; padding: 24px; border-radius: 12px; border: 1px solid #334155; transition: all 0.2s; }
+        .card:hover { border-color: #38bdf8; transform: translateY(-2px); }
+        a { color: #38bdf8; text-decoration: none; font-size: 18px; font-weight: 600; display: block; }
+        p { color: #94a3b8; margin-top: 8px; font-size: 14px; }
+        .badge { display: inline-block; background: #334155; color: #94a3b8; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-top: 12px; }
+    </style>
+</head>
+<body>
+    <h1>6AMDev Test Projects</h1>
+    <p class="subtitle">Development & Testing Environment</p>
+    <div class="grid">
+        <div class="card">
+            <a href="https://mc.6amdev.com">Mission Control</a>
+            <p>AI Agent Task Management</p>
+            <span class="badge">React + FastAPI</span>
+        </div>
+        <div class="card">
+            <a href="https://git.6amdev.com">Gitea</a>
+            <p>Git Repository</p>
+            <span class="badge">Gitea</span>
+        </div>
+        <div class="card">
+            <a href="https://api.6amdev.com/docs">API Docs</a>
+            <p>Platform API</p>
+            <span class="badge">FastAPI</span>
+        </div>
+        <div class="card">
+            <a href="https://code.6amdev.com">VS Code</a>
+            <p>Code Server</p>
+            <span class="badge">code-server</span>
+        </div>
+    </div>
+</body>
+</html>
+HTML
+}
+
+# =============================================================
+# Fallback for direct IP access
+# =============================================================
 :80 {
-    respond /health 200
-
-    # API
-    handle /api/* {
-        reverse_proxy mc-backend:4000
-    }
-
-    # Frontend
-    handle {
-        reverse_proxy mc-frontend:80
-    }
+    respond "6AMDev Server - Use subdomains: mc.6amdev.com, git.6amdev.com, api.6amdev.com, code.6amdev.com, dev.6amdev.com"
 }

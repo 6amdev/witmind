@@ -1,0 +1,107 @@
+# Agent Definition Template
+# Copy ไปใช้ที่: platform/teams/{team}/agents/{agent_id}.yaml
+
+# =============================================================================
+# BASIC INFO
+# =============================================================================
+
+agent:
+  id: {agent_id}                    # Unique ID (lowercase, underscore)
+  name: "{Agent Display Name}"       # Human-readable name
+  team: {team_id}                   # Team: dev, marketing, creative
+  role: "{role_type}"               # Role: manager, analyst, architect, developer, tester, etc.
+  description: "{What this agent does}"
+  icon: "{emoji}"                   # Single emoji representing the agent
+
+# =============================================================================
+# LLM CONFIGURATION
+# =============================================================================
+
+llm:
+  primary:
+    provider: "claude"              # claude, openrouter, ollama
+    model: "sonnet"                 # opus, sonnet, haiku (for claude)
+    reason: "{Why this model}"
+  fallback:
+    provider: "claude"
+    model: "haiku"
+
+# =============================================================================
+# CAPABILITIES (Skills)
+# =============================================================================
+
+capabilities:
+  - {capability_1}                  # e.g., requirement_analysis
+  - {capability_2}                  # e.g., project_planning
+  - {capability_3}                  # e.g., team_assignment
+  # Add more as needed
+
+# =============================================================================
+# TOOLS ALLOWED
+# =============================================================================
+
+allowed_tools:
+  - Read                            # Read files
+  - Write                           # Write new files
+  - Edit                            # Edit existing files
+  - Glob                            # Find files
+  - Grep                            # Search content
+  # - Bash                          # Execute commands (be careful!)
+  # - WebSearch                     # Search the web
+  # - WebFetch                      # Fetch web content
+
+# =============================================================================
+# WORKFLOW
+# =============================================================================
+
+workflow:
+  # What triggers this agent
+  watches: "{path/to/watch}"        # e.g., projects/inbox/
+
+  # What this agent needs
+  inputs:
+    - "{INPUT_FILE.md}"
+
+  # What this agent creates
+  outputs:
+    - "{OUTPUT_FILE.md}"
+    - "{ANOTHER_OUTPUT.yaml}"
+
+  # Who to notify when done
+  notifies:
+    - {next_agent_id}
+
+# =============================================================================
+# PROMPT
+# =============================================================================
+
+prompt_file: "prompts/{agent_id}.md"  # System prompt location
+
+# =============================================================================
+# BEHAVIOR
+# =============================================================================
+
+behavior:
+  # When to ask the user for input
+  ask_user_when:
+    - "{condition_1}"               # e.g., "requirement ไม่ชัดเจน"
+    - "{condition_2}"
+
+  # When to proceed automatically
+  auto_proceed_when:
+    - "{condition_1}"               # e.g., "requirement ชัดเจน"
+    - "{condition_2}"
+
+  # When to report immediately
+  report_immediately:
+    - "{condition_1}"               # e.g., "พบ security concern"
+    - "{condition_2}"
+
+# =============================================================================
+# RESOURCE LIMITS
+# =============================================================================
+
+limits:
+  max_tokens: 8000                  # Max output tokens
+  timeout_minutes: 30               # Max execution time
+  max_iterations: 10                # Max loops/retries

@@ -1,0 +1,78 @@
+# Template A: Coding Focus
+# ใช้ qwen2.5-coder เป็นหลัก เหมาะกับ project ที่เน้น code
+#
+# ┌─────────────────────────────────────────────────────────┐
+# │              TEMPLATE A: CODING FOCUS                   │
+# ├─────────────────────────────────────────────────────────┤
+# │                                                         │
+# │   Agent              Model              Reason          │
+# │   ─────────────────────────────────────────────────     │
+# │   business_analyst   qwen2.5-coder:7b   Tech specs      │
+# │   uxui_designer      qwen2.5-coder:7b   Component code  │
+# │   tech_lead          qwen2.5-coder:7b   Architecture    │
+# │   pm                 llama3:latest      Coordination    │
+# │   backend_dev        qwen2.5-coder:7b   ⭐ Main focus   │
+# │   frontend_dev       qwen2.5-coder:7b   ⭐ Main focus   │
+# │   fullstack_dev      qwen2.5-coder:7b   ⭐ Main focus   │
+# │   devops             qwen2.5-coder:7b   Config/scripts  │
+# │   qa_tester          qwen2.5-coder:7b   Test code       │
+# │   security_auditor   deepseek-r1:8b     Security review │
+# │                                                         │
+# │   Primary Model: qwen2.5-coder:7b (8/10 agents)        │
+# └─────────────────────────────────────────────────────────┘
+
+preset_name: ollama_coding
+description: "Coding-focused configuration using qwen2.5-coder"
+
+defaults:
+  provider: ollama
+  host: http://192.168.80.203:11434
+  timeout: 300
+
+agents:
+  business_analyst:
+    model: qwen2.5-coder:7b
+    temperature: 0.4
+
+  uxui_designer:
+    model: qwen2.5-coder:7b
+    temperature: 0.5
+
+  tech_lead:
+    model: qwen2.5-coder:7b
+    temperature: 0.4
+
+  pm:
+    model: llama3:latest
+    temperature: 0.5
+
+  backend_dev:
+    model: qwen2.5-coder:7b
+    temperature: 0.3
+
+  frontend_dev:
+    model: qwen2.5-coder:7b
+    temperature: 0.3
+
+  fullstack_dev:
+    model: qwen2.5-coder:7b
+    temperature: 0.3
+
+  devops:
+    model: qwen2.5-coder:7b
+    temperature: 0.2
+
+  qa_tester:
+    model: qwen2.5-coder:7b
+    temperature: 0.3
+
+  security_auditor:
+    model: deepseek-r1:8b
+    temperature: 0.2
+
+# Best for:
+#   ✅ REST API development
+#   ✅ CLI tools
+#   ✅ Microservices
+#   ✅ Scripts and automation
+#   ❌ Complex business logic (use Template B)

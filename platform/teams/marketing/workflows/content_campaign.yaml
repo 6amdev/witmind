@@ -1,0 +1,82 @@
+# Content Campaign Workflow
+
+workflow:
+  id: content_campaign
+  name: "Content Marketing Campaign"
+  team: marketing
+  description: "สร้างแคมเปญคอนเทนต์การตลาดครบวงจร"
+
+  trigger:
+    type: "new_file"
+    path: "projects/inbox/*marketing*.yaml"
+
+  stages:
+
+    - stage: "strategy"
+      name: "วางกลยุทธ์"
+      agent: marketing_lead
+      actions:
+        - analyze_requirements
+        - research_competitors
+        - define_audience
+        - create_strategy
+      outputs:
+        - "MARKETING_STRATEGY.md"
+        - "CAMPAIGN_PLAN.md"
+      next: "content"
+      timeout_minutes: 45
+
+    - stage: "content"
+      name: "สร้างคอนเทนต์"
+      parallel: true
+      tasks:
+        - agent: content_writer
+          task: "create_blog_content"
+        - agent: copywriter
+          task: "create_ad_copies"
+        - agent: social_media_manager
+          task: "plan_social_content"
+      outputs:
+        - "content/**"
+        - "copy/**"
+        - "social/**"
+      next: "optimization"
+      timeout_minutes: 90
+
+    - stage: "optimization"
+      name: "ปรับปรุง SEO"
+      agent: seo_specialist
+      inputs:
+        - "content/**"
+      actions:
+        - keyword_optimization
+        - meta_tags
+        - content_suggestions
+      outputs:
+        - "SEO_REPORT.md"
+        - "OPTIMIZED_CONTENT/**"
+      next: "review"
+      timeout_minutes: 30
+
+    - stage: "review"
+      name: "ตรวจสอบและอนุมัติ"
+      agent: marketing_lead
+      inputs:
+        - "OPTIMIZED_CONTENT/**"
+        - "SEO_REPORT.md"
+      actions:
+        - final_review
+        - create_schedule
+        - prepare_delivery
+      outputs:
+        - "CONTENT_CALENDAR.md"
+        - "DELIVERY.md"
+      on_complete: "move_to_completed"
+      timeout_minutes: 30
+
+  notifications:
+    on_stage_complete: false
+    on_error: true
+    on_complete: true
+    channels:
+      - log

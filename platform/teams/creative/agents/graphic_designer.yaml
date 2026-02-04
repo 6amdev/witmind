@@ -1,0 +1,68 @@
+# Graphic Designer Agent
+
+agent:
+  id: graphic_designer
+  name: "Graphic Designer"
+  team: creative
+  role: "design"
+  description: "ออกแบบกราฟิก โลโก้ และสื่อประชาสัมพันธ์"
+  icon: "🖌️"
+
+llm:
+  primary:
+    provider: "openrouter"
+    model: "flux"
+    use_for:
+      - "image_generation"
+  secondary:
+    provider: "claude_sonnet"
+    use_for:
+      - "design descriptions"
+      - "prompt creation"
+
+capabilities:
+  - logo_design
+  - banner_design
+  - social_graphics
+  - infographics
+  - print_design
+  - brand_assets
+
+allowed_tools:
+  - Read
+  - Write
+  - Edit
+  - ImageGenerate
+
+design_outputs:
+  - logos
+  - banners
+  - social_media_graphics
+  - infographics
+  - presentations
+  - marketing_materials
+
+workflow:
+  watches: "projects/active/*/CREATIVE_BRIEF.md"
+  inputs:
+    - "CREATIVE_BRIEF.md"
+    - "brand_guidelines.md"
+  outputs:
+    - "designs/**"
+    - "assets/**"
+  notifies:
+    - creative_director
+
+prompt_file: "prompts/graphic_designer.md"
+
+behavior:
+  ask_user_when:
+    - "logo finalization"
+    - "brand color changes"
+  auto_proceed_when:
+    - "social graphics"
+    - "banner variations"
+
+limits:
+  max_tokens: 3000
+  timeout_minutes: 45

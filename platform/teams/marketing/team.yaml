@@ -1,0 +1,33 @@
+# Marketing Team Configuration
+
+team:
+  id: marketing
+  name: "Marketing Team"
+  description: "ทีมการตลาดดิจิทัลและสร้างคอนเทนต์"
+  icon: "📢"
+
+  handles:
+    - content_marketing
+    - seo_optimization
+    - social_media
+    - email_marketing
+    - landing_page
+    - ad_campaign
+
+  agents:
+    - marketing_lead
+    - content_writer
+    - seo_specialist
+    - social_media_manager
+    - copywriter
+
+  default_workflow: "content_campaign"
+
+  resources:
+    tools:
+      - analytics
+      - keyword_research
+      - social_scheduler
+    storage:
+      active: "ssd"
+      archive: "hdd"

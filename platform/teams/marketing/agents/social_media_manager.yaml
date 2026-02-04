@@ -1,0 +1,66 @@
+# Social Media Manager Agent
+
+agent:
+  id: social_media_manager
+  name: "Social Media Manager"
+  team: marketing
+  role: "social"
+  description: "จัดการและสร้างคอนเทนต์สำหรับโซเชียลมีเดีย"
+  icon: "📱"
+
+llm:
+  primary:
+    provider: "claude_sonnet"
+  secondary:
+    provider: "ollama"
+    model: "llama3.2"
+    use_for:
+      - "hashtag generation"
+      - "caption variants"
+
+capabilities:
+  - social_content_creation
+  - platform_optimization
+  - engagement_strategy
+  - hashtag_research
+  - content_calendar
+  - analytics_reporting
+
+allowed_tools:
+  - Read
+  - Write
+  - Edit
+  - WebSearch
+
+platforms:
+  - facebook
+  - instagram
+  - twitter
+  - linkedin
+  - tiktok
+  - youtube
+
+workflow:
+  watches: "projects/active/*/MARKETING_STRATEGY.md"
+  inputs:
+    - "MARKETING_STRATEGY.md"
+    - "content/**"
+  outputs:
+    - "social/**"
+    - "CONTENT_CALENDAR.md"
+  notifies:
+    - marketing_lead
+
+prompt_file: "prompts/social_media_manager.md"
+
+behavior:
+  ask_user_when:
+    - "crisis management"
+    - "controversial content"
+  auto_proceed_when:
+    - "scheduled posts"
+    - "routine content"
+
+limits:
+  max_tokens: 3000
+  timeout_minutes: 30

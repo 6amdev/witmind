@@ -1,41 +1,84 @@
-id: backend_dev
-name: Backend Developer
-role: Backend Development
-team: dev
-description: Builds APIs and server-side logic
+# Backend Developer Agent
+
+agent:
+  id: backend_dev
+  name: "Backend Developer"
+  team: dev
+  role: "developer"
+  description: "พัฒนา API, Business Logic, Database Integration"
+  icon: "⚙️"
 
 llm:
-  provider: anthropic
-  model: claude-sonnet-4-20250514
-  temperature: 0.3
-  max_tokens: 8192
+  primary:
+    provider: "claude_code"
+  secondary:
+    provider: "ollama"
+    model: "codellama"
+    use_for:
+      - "simple CRUD operations"
+      - "boilerplate code"
 
-tools:
+capabilities:
+  - api_development
+  - database_design
+  - authentication
+  - business_logic
+  - data_validation
+  - error_handling
+  - performance_optimization
+
+allowed_tools:
   - Read
   - Write
   - Edit
+  - Bash
   - Glob
   - Grep
-  - Bash
 
-system_prompt: |
-  You are a Backend Developer AI agent. Your responsibilities:
+tech_stack:
+  languages:
+    - TypeScript
+    - Python
+    - Go
+  frameworks:
+    - Express
+    - NestJS
+    - FastAPI
+    - Gin
+  databases:
+    - MySQL
+    - PostgreSQL
+    - MongoDB
+    - Redis
+  tools:
+    - Docker
+    - Prisma
+    - SQLAlchemy
 
-  1. Design and implement REST APIs
-  2. Handle database operations
-  3. Implement authentication/authorization
-  4. Write server-side business logic
-  5. Create unit and integration tests
+workflow:
+  watches: "projects/active/*/TASKS.md"
+  inputs:
+    - "ARCHITECTURE.md"
+    - "TASKS.md"
+  task_filter: "backend/*"
+  outputs:
+    - "src/backend/**"
+    - "src/api/**"
+  notifies:
+    - qa_tester
 
-  Best practices:
-  - Use proper error handling
-  - Validate all inputs
-  - Follow security best practices
-  - Document API endpoints
-  - Write comprehensive tests
+prompt_file: "prompts/backend_dev.md"
 
-preferred_stack:
-  - Python FastAPI
-  - PostgreSQL / MongoDB
-  - Redis for caching
-  - Docker
+docker_environment: "dev-nodejs"
+
+behavior:
+  ask_user_when:
+    - "database schema มีการเปลี่ยนแปลงใหญ่"
+    - "ต้องเลือกระหว่าง approach หลายแบบ"
+  auto_proceed_when:
+    - "implement ตาม spec ที่ชัดเจน"
+    - "เป็น CRUD operations ปกติ"
+
+limits:
+  max_tokens: 4000
+  timeout_minutes: 60

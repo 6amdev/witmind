@@ -1,0 +1,75 @@
+# 6AMDev AI Platform - Global Settings
+
+platform:
+  name: "6AMDev AI Platform"
+  version: "1.0.0"
+  environment: "development"  # development | staging | production
+
+# Server Configuration
+server:
+  host: "192.168.80.203"
+  ssh_user: "wit"
+
+# Paths
+paths:
+  root: "/home/wit/6amdev"
+  projects: "/home/wit/6amdev/projects"
+  logs: "/home/wit/6amdev/logs"
+  storage:
+    ssd: "/home/wit/6amdev"
+    hdd: "/mnt/data/6amdev"
+
+# Project Limits
+limits:
+  max_active_projects: 5
+  max_queue_projects: 10
+  max_review_projects: 3
+  project_timeout_hours: 72
+
+# Agent Configuration
+agents:
+  max_concurrent: 3
+  default_timeout_minutes: 30
+  retry_attempts: 3
+  retry_delay_seconds: 60
+
+# Storage Policies
+storage:
+  ssd:
+    warning_threshold_percent: 70
+    critical_threshold_percent: 85
+    cleanup_on_critical: true
+  hdd:
+    archive_after_days: 7
+    compress_after_days: 30
+    delete_after_days: 365
+
+# Logging
+logging:
+  level: "INFO"  # DEBUG | INFO | WARNING | ERROR
+  retention_days: 30
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# Notifications
+notifications:
+  enabled: true
+  on_project_complete: true
+  on_error: true
+  on_need_input: true
+  channels:
+    - type: "log"
+    - type: "file"
+      path: "/home/wit/6amdev/logs/notifications.log"
+
+# Docker
+docker:
+  network: "6amdev-net"
+  cleanup_unused_images_days: 7
+  cleanup_stopped_containers_hours: 24
+
+# Git
+git:
+  auto_commit: true
+  remote_gitea: "http://192.168.80.203:3000/wit"
+  remote_github: "https://github.com/6amdev"
+  default_branch: "main"

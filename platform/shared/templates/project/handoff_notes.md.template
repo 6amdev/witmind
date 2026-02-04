@@ -1,0 +1,113 @@
+# {{PROJECT_NAME}} - Handoff Notes
+
+> Notes สำหรับส่งต่อระหว่าง Stages
+
+---
+
+## Current Stage: {{CURRENT_STAGE}}
+**Completed by:** {{AGENT_NAME}}
+**Date:** {{DATE}}
+
+---
+
+## Summary of Work Done
+
+### What was accomplished:
+- [x] {{TASK_1}}
+- [x] {{TASK_2}}
+- [x] {{TASK_3}}
+
+### Key outputs:
+| File | Description |
+|------|-------------|
+| {{FILE_1}} | {{DESCRIPTION_1}} |
+| {{FILE_2}} | {{DESCRIPTION_2}} |
+
+---
+
+## For Next Stage: {{NEXT_STAGE}}
+
+### Priority Tasks:
+1. **[High]** {{PRIORITY_TASK_1}}
+2. **[Medium]** {{PRIORITY_TASK_2}}
+3. **[Low]** {{PRIORITY_TASK_3}}
+
+### Dependencies:
+- [ ] {{DEPENDENCY_1}}
+- [ ] {{DEPENDENCY_2}}
+
+### Resources Needed:
+- {{RESOURCE_1}}
+- {{RESOURCE_2}}
+
+---
+
+## Important Information
+
+### Assumptions Made:
+> สิ่งที่สมมติไว้ (next agent ควรตรวจสอบ)
+
+1. {{ASSUMPTION_1}}
+2. {{ASSUMPTION_2}}
+
+### Decisions Made:
+> การตัดสินใจที่ทำไปแล้ว (ดู decisions_log.md สำหรับรายละเอียด)
+
+| Decision | Reason | Impact |
+|----------|--------|--------|
+| {{DECISION_1}} | {{REASON_1}} | {{IMPACT_1}} |
+
+### Known Issues:
+> ปัญหาที่รู้แต่ยังไม่ได้แก้
+
+| Issue | Severity | Workaround |
+|-------|----------|------------|
+| {{ISSUE_1}} | High/Med/Low | {{WORKAROUND_1}} |
+
+### Risks:
+> ความเสี่ยงที่ต้องระวัง
+
+| Risk | Probability | Mitigation |
+|------|-------------|------------|
+| {{RISK_1}} | High/Med/Low | {{MITIGATION_1}} |
+
+---
+
+## Technical Notes
+
+### Environment:
+```
+Node version: {{NODE_VERSION}}
+Database: {{DB_TYPE}}
+...
+```
+
+### How to run:
+```bash
+{{RUN_COMMANDS}}
+```
+
+### Credentials/Secrets:
+> ไม่ใส่ credentials ที่นี่! แค่บอกว่าอยู่ที่ไหน
+
+- API keys: See `.env.example`
+- Database: Contact DevOps
+
+---
+
+## Questions for Next Agent
+
+1. {{QUESTION_1}}
+2. {{QUESTION_2}}
+
+---
+
+## Contact
+
+If you have questions about this handoff:
+- Previous agent: {{PREVIOUS_AGENT}}
+- Related memory: `.memory/{{AGENT_ID}}.json`
+
+---
+
+*Last updated: {{DATE}}*

@@ -1,0 +1,222 @@
+# {{PROJECT_NAME}} - Existing Code Analysis
+
+> วิเคราะห์โดย: Tech Lead Agent
+> วันที่: {{DATE}}
+
+## 1. Executive Summary
+
+**Overall Assessment:** {{GOOD/FAIR/NEEDS_WORK}}
+
+{{SUMMARY_IN_2_3_SENTENCES}}
+
+---
+
+## 2. Project Overview
+
+### 2.1 Basic Information
+| Item | Value |
+|------|-------|
+| Repository | {{REPO_URL_OR_PATH}} |
+| Primary Language | {{LANGUAGE}} |
+| Framework | {{FRAMEWORK}} |
+| Lines of Code | {{LOC}} |
+| Last Updated | {{LAST_COMMIT_DATE}} |
+
+### 2.2 Project Type
+- [ ] Web Application (Full-stack)
+- [ ] Web Application (Frontend only)
+- [ ] API Service
+- [ ] Mobile App
+- [ ] CLI Tool
+- [ ] Library/Package
+
+---
+
+## 3. Architecture Analysis
+
+### 3.1 Current Architecture
+```
+{{ARCHITECTURE_DIAGRAM}}
+```
+
+### 3.2 Folder Structure
+```
+{{FOLDER_STRUCTURE}}
+```
+
+### 3.3 Key Components
+| Component | Location | Description | Health |
+|-----------|----------|-------------|--------|
+| {{COMPONENT}} | {{PATH}} | {{DESC}} | 🟢/🟡/🔴 |
+
+---
+
+## 4. Technology Stack
+
+### 4.1 Frontend
+| Technology | Version | Status |
+|------------|---------|--------|
+| {{TECH}} | {{VERSION}} | Current/Outdated/EOL |
+
+### 4.2 Backend
+| Technology | Version | Status |
+|------------|---------|--------|
+| {{TECH}} | {{VERSION}} | Current/Outdated/EOL |
+
+### 4.3 Database
+| Technology | Version | Status |
+|------------|---------|--------|
+| {{TECH}} | {{VERSION}} | Current/Outdated/EOL |
+
+### 4.4 DevOps/Infrastructure
+| Technology | Version | Status |
+|------------|---------|--------|
+| {{TECH}} | {{VERSION}} | Current/Outdated/EOL |
+
+---
+
+## 5. Code Quality Assessment
+
+### 5.1 Code Metrics
+| Metric | Value | Rating |
+|--------|-------|--------|
+| Test Coverage | {{X}}% | 🟢/🟡/🔴 |
+| Cyclomatic Complexity | {{X}} | 🟢/🟡/🔴 |
+| Duplicated Code | {{X}}% | 🟢/🟡/🔴 |
+| Documentation | {{X}}% | 🟢/🟡/🔴 |
+
+### 5.2 Code Patterns Found
+| Pattern | Usage | Assessment |
+|---------|-------|------------|
+| {{PATTERN}} | {{WHERE}} | Good/Problematic |
+
+### 5.3 Anti-patterns Found
+| Anti-pattern | Location | Severity |
+|--------------|----------|----------|
+| {{ANTIPATTERN}} | {{FILE:LINE}} | High/Med/Low |
+
+---
+
+## 6. Dependencies Analysis
+
+### 6.1 Dependency Overview
+- Total Dependencies: {{COUNT}}
+- Direct: {{COUNT}}
+- Dev: {{COUNT}}
+- Outdated: {{COUNT}}
+- Vulnerable: {{COUNT}}
+
+### 6.2 Critical Dependencies
+| Package | Current | Latest | Action Needed |
+|---------|---------|--------|---------------|
+| {{PACKAGE}} | {{V1}} | {{V2}} | Update/Replace/Keep |
+
+### 6.3 Vulnerabilities Found
+| Package | Severity | CVE | Fix |
+|---------|----------|-----|-----|
+| {{PACKAGE}} | Critical/High/Med | {{CVE}} | Upgrade to {{V}} |
+
+---
+
+## 7. Features Inventory
+
+### 7.1 Implemented Features
+| Feature | Status | Location | Notes |
+|---------|--------|----------|-------|
+| {{FEATURE}} | Working/Partial/Broken | {{PATH}} | {{NOTES}} |
+
+### 7.2 Feature Health
+- 🟢 Working Well: {{COUNT}}
+- 🟡 Needs Attention: {{COUNT}}
+- 🔴 Broken/Critical: {{COUNT}}
+
+---
+
+## 8. Issues Identified
+
+### 8.1 Critical Issues (Must Fix)
+| ID | Issue | Impact | Location |
+|----|-------|--------|----------|
+| C1 | {{ISSUE}} | {{IMPACT}} | {{LOCATION}} |
+
+### 8.2 High Priority Issues
+| ID | Issue | Impact | Location |
+|----|-------|--------|----------|
+| H1 | {{ISSUE}} | {{IMPACT}} | {{LOCATION}} |
+
+### 8.3 Medium Priority Issues
+| ID | Issue | Impact | Location |
+|----|-------|--------|----------|
+| M1 | {{ISSUE}} | {{IMPACT}} | {{LOCATION}} |
+
+### 8.4 Low Priority / Nice to Have
+| ID | Issue | Impact | Location |
+|----|-------|--------|----------|
+| L1 | {{ISSUE}} | {{IMPACT}} | {{LOCATION}} |
+
+---
+
+## 9. Recommendations
+
+### 9.1 Immediate Actions (Before any development)
+1. {{ACTION_1}}
+2. {{ACTION_2}}
+
+### 9.2 Short-term Improvements (Sprint 1-2)
+1. {{IMPROVEMENT_1}}
+2. {{IMPROVEMENT_2}}
+
+### 9.3 Long-term Strategy
+1. {{STRATEGY_1}}
+2. {{STRATEGY_2}}
+
+### 9.4 Migration Approach
+| Approach | Pros | Cons | Recommended |
+|----------|------|------|-------------|
+| Full Rewrite | - Clean start | - Time consuming | |
+| Incremental | - Lower risk | - Tech debt remains | ✅ |
+| Hybrid | - Balance | - Complex | |
+
+---
+
+## 10. Effort Estimation
+
+### 10.1 By Category
+| Category | Effort | Priority |
+|----------|--------|----------|
+| Security Fixes | {{X}} days | P1 |
+| Bug Fixes | {{X}} days | P1 |
+| Refactoring | {{X}} days | P2 |
+| New Features | {{X}} days | P3 |
+
+### 10.2 Total Estimate
+- **Minimum Viable:** {{X}} days
+- **Recommended:** {{X}} days
+- **Complete Overhaul:** {{X}} days
+
+---
+
+## 11. Questions for Stakeholder
+
+1. {{QUESTION_1}}
+2. {{QUESTION_2}}
+3. {{QUESTION_3}}
+
+---
+
+## Appendix
+
+### A. Files Analyzed
+```
+{{LIST_OF_FILES}}
+```
+
+### B. Tools Used
+- Static Analysis: {{TOOLS}}
+- Dependency Audit: {{TOOLS}}
+- Code Metrics: {{TOOLS}}
+
+### C. Full Dependency List
+```
+{{PACKAGE_JSON_OR_REQUIREMENTS}}
+```

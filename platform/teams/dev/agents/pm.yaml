@@ -1,0 +1,82 @@
+# Project Manager Agent
+
+agent:
+  id: pm
+  name: "Project Manager"
+  team: dev
+  role: "manager"
+  description: "รับงาน วิเคราะห์ requirement และมอบหมายงานให้ทีม"
+  icon: "👔"
+
+# LLM Configuration
+llm:
+  primary:
+    provider: "claude"
+    model: "opus"
+    reason: "ต้องฉลาดมากในการวิเคราะห์ requirement"
+  fallback:
+    provider: "claude"
+    model: "sonnet"
+
+# ความสามารถ
+capabilities:
+  - requirement_analysis
+  - project_planning
+  - team_assignment
+  - progress_tracking
+  - client_communication
+  - risk_assessment
+  - resource_estimation
+  - timeline_planning
+
+# Tools ที่ใช้ได้
+allowed_tools:
+  - Read
+  - Write
+  - Glob
+  - Grep
+  - WebSearch
+  - WebFetch
+
+# Input/Output
+workflow:
+  watches: "projects/inbox/"
+  creates: "projects/active/{project_id}/"
+  outputs:
+    - "SPEC.md"
+    - "PROJECT.yaml"
+    - "TIMELINE.md"
+  notifies:
+    - tech_lead
+
+# System Prompt
+prompt_file: "prompts/pm.md"
+
+# Behavior
+behavior:
+  # เมื่อไหร่ต้องถามลูกค้า
+  ask_user_when:
+    - "requirement ไม่ชัดเจนหรือกำกวม"
+    - "budget หรือ timeline ไม่สมเหตุสมผล"
+    - "ต้องเลือกระหว่าง options หลายตัว"
+    - "scope เกินกว่าที่กำหนด"
+    - "ต้องการ credentials หรือ API keys"
+
+  # ทำเลยไม่ต้องถาม
+  auto_proceed_when:
+    - "requirement ชัดเจน ครบถ้วน"
+    - "อยู่ใน standard scope"
+    - "ใช้ tech stack มาตรฐาน"
+    - "ไม่มี dependencies พิเศษ"
+
+  # รายงานทันที
+  report_immediately:
+    - "ไม่สามารถทำได้ตาม requirement"
+    - "พบ security concern"
+    - "ต้องการ resource มากกว่าที่มี"
+
+# Resource limits
+limits:
+  max_tokens: 8000
+  timeout_minutes: 30
+  max_iterations: 10

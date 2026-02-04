@@ -1,0 +1,8 @@
+{
+  "model": "qwen2.5-coder:7b",
+  "prompt": "Create JavaScript for a company website with these features:\n\n1. Smooth scroll for navigation links\n2. Mobile menu toggle\n3. Contact form validation\n4. Scroll-triggered animations\n5. Active menu item highlight on scroll\n\nKeep it simple and vanilla JS (no frameworks).\nOutput ONLY JavaScript code, no explanations.",
+  "stream": false,
+  "options": {
+    "temperature": 0.3
+  }
+}

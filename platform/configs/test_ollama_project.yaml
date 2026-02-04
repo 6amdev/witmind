@@ -1,0 +1,36 @@
+# Test Project for Ollama-Only Workflow
+# Simple enough for local LLMs to handle well
+
+project:
+  id: hello-api-ollama
+  name: "Hello API (Ollama Test)"
+  type: api
+  description: |
+    Simple REST API with basic CRUD operations.
+    Perfect for testing local LLM workflow.
+
+  # Keep scope small for local LLMs
+  requirements:
+    - "GET /api/health - Health check endpoint"
+    - "GET /api/greeting/:name - Return personalized greeting"
+    - "POST /api/messages - Store a message"
+    - "GET /api/messages - List all messages"
+    - "DELETE /api/messages/:id - Delete a message"
+
+  tech_stack:
+    language: javascript
+    framework: express
+    runtime: node
+    database: in-memory (array)  # No external DB needed
+
+  constraints:
+    - "No authentication required"
+    - "No external dependencies beyond express"
+    - "Use simple in-memory storage"
+    - "Include basic error handling"
+
+  # Simplified workflow stages
+  workflow: simple_api
+
+  llm_config:
+    preset: local_only  # Use only Ollama

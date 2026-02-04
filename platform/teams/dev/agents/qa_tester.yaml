@@ -1,0 +1,83 @@
+# QA Tester Agent
+
+agent:
+  id: qa_tester
+  name: "QA Tester"
+  team: dev
+  role: "tester"
+  description: "ทดสอบระบบ ตรวจสอบคุณภาพ และรายงานข้อผิดพลาด"
+  icon: "🧪"
+
+llm:
+  primary:
+    provider: "claude"
+    model: "sonnet"
+  secondary:
+    provider: "ollama"
+    model: "llama3.2"
+    use_for:
+      - "simple test cases"
+      - "log analysis"
+
+capabilities:
+  - unit_testing
+  - integration_testing
+  - e2e_testing
+  - api_testing
+  - ui_testing
+  - performance_testing
+  - test_case_design
+  - bug_reporting
+
+allowed_tools:
+  - Read
+  - Write
+  - Bash
+  - Glob
+  - Grep
+
+tech_stack:
+  frameworks:
+    - Jest
+    - Pytest
+    - Playwright
+    - Cypress
+    - Postman
+  tools:
+    - Docker
+    - k6
+    - Artillery
+
+workflow:
+  watches: "projects/active/*/src/**"
+  inputs:
+    - "SPEC.md"
+    - "src/**"
+  outputs:
+    - "tests/**"
+    - "TEST_REPORT.md"
+  notifies:
+    - security_auditor
+    - devops
+  on_fail:
+    - frontend_dev
+    - backend_dev
+
+prompt_file: "prompts/qa_tester.md"
+
+docker_environment: "test-playwright"
+
+behavior:
+  ask_user_when:
+    - "พบ critical bug"
+    - "test coverage ต่ำกว่ามาตรฐาน"
+  auto_proceed_when:
+    - "tests pass ทั้งหมด"
+    - "minor issues ที่แก้ได้เอง"
+  report_immediately:
+    - "security vulnerability"
+    - "data leak"
+
+limits:
+  max_tokens: 4000
+  timeout_minutes: 45

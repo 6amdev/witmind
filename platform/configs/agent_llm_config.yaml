@@ -1,0 +1,173 @@
+# Agent LLM Configuration
+# กำหนด LLM provider/model สำหรับแต่ละ Agent
+# Priority: Agent YAML > Config นี้ > Defaults
+
+# Global defaults
+defaults:
+  provider: claude_code
+  model: claude-sonnet-4-20250514
+  temperature: 0.5
+  max_tokens: 4096
+  timeout: 300
+
+# Per-agent configuration
+agents:
+  # =====================================================
+  # HIGH QUALITY AGENTS - ใช้ Opus (แพงแต่ดีที่สุด)
+  # =====================================================
+  business_analyst:
+    provider: claude_code
+    model: claude-opus-4-20250514
+    temperature: 0.5
+    max_tokens: 8192
+    reason: "BA ต้องวิเคราะห์ลึก ใช้ Opus"
+
+  uxui_designer:
+    provider: claude_code
+    model: claude-opus-4-20250514
+    temperature: 0.7
+    reason: "UX ต้องมี creativity"
+
+  security_auditor:
+    provider: claude_code
+    model: claude-opus-4-20250514
+    temperature: 0.3
+    reason: "Security ต้องละเอียด"
+
+  # =====================================================
+  # STANDARD AGENTS - ใช้ Sonnet (สมดุล)
+  # =====================================================
+  pm:
+    provider: claude_code
+    model: claude-sonnet-4-20250514
+
+  tech_lead:
+    provider: claude_code
+    model: claude-sonnet-4-20250514
+    temperature: 0.4
+
+  backend_dev:
+    provider: claude_code
+    model: claude-sonnet-4-20250514
+
+  frontend_dev:
+    provider: claude_code
+    model: claude-sonnet-4-20250514
+
+  fullstack_dev:
+    provider: claude_code
+    model: claude-sonnet-4-20250514
+
+  devops:
+    provider: claude_code
+    model: claude-sonnet-4-20250514
+    temperature: 0.3
+
+  # =====================================================
+  # COST-SAVING AGENTS - ใช้ Ollama/Haiku (ถูก/ฟรี)
+  # =====================================================
+  qa_tester:
+    provider: ollama
+    model: llama3.1:70b
+    temperature: 0.3
+    reason: "Test เป็น mechanical work, ใช้ local ได้"
+
+  # Alternative: ใช้ Haiku (ถูกกว่า Sonnet)
+  # qa_tester:
+  #   provider: claude_code
+  #   model: claude-3-5-haiku-20241022
+
+# =====================================================
+# Provider configurations
+# =====================================================
+providers:
+  claude_code:
+    models:
+      opus:
+        id: claude-opus-4-20250514
+        cost: "$$$$$"
+        use_for: "Critical analysis, complex tasks"
+      sonnet:
+        id: claude-sonnet-4-20250514
+        cost: "$$$"
+        use_for: "Standard development tasks"
+      haiku:
+        id: claude-3-5-haiku-20241022
+        cost: "$"
+        use_for: "Quick tasks, high volume"
+
+  openrouter:
+    api_key: ${OPENROUTER_API_KEY}
+    models:
+      claude-sonnet:
+        id: anthropic/claude-3.5-sonnet
+        cost: "$$$"
+      gpt4:
+        id: openai/gpt-4-turbo
+        cost: "$$$"
+      llama-405b:
+        id: meta-llama/llama-3.1-405b-instruct
+        cost: "$$"
+
+  ollama:
+    host: http://localhost:11434
+    models:
+      llama-70b:
+        id: llama3.1:70b
+        cost: "FREE"
+        vram: "48GB+"
+      llama-8b:
+        id: llama3.1:8b
+        cost: "FREE"
+        vram: "8GB"
+      codellama:
+        id: codellama:34b
+        cost: "FREE"
+        vram: "24GB"
+
+# =====================================================
+# Cost Optimization Presets
+# =====================================================
+presets:
+  # Maximum quality (expensive)
+  max_quality:
+    business_analyst: { provider: claude_code, model: claude-opus-4-20250514 }
+    uxui_designer: { provider: claude_code, model: claude-opus-4-20250514 }
+    security_auditor: { provider: claude_code, model: claude-opus-4-20250514 }
+    tech_lead: { provider: claude_code, model: claude-opus-4-20250514 }
+    pm: { provider: claude_code, model: claude-opus-4-20250514 }
+    backend_dev: { provider: claude_code, model: claude-sonnet-4-20250514 }
+    frontend_dev: { provider: claude_code, model: claude-sonnet-4-20250514 }
+    fullstack_dev: { provider: claude_code, model: claude-sonnet-4-20250514 }
+    devops: { provider: claude_code, model: claude-sonnet-4-20250514 }
+    qa_tester: { provider: claude_code, model: claude-sonnet-4-20250514 }
+
+  # Balanced (default)
+  balanced:
+    business_analyst: { provider: claude_code, model: claude-opus-4-20250514 }
+    uxui_designer: { provider: claude_code, model: claude-opus-4-20250514 }
+    security_auditor: { provider: claude_code, model: claude-opus-4-20250514 }
+    tech_lead: { provider: claude_code, model: claude-sonnet-4-20250514 }
+    pm: { provider: claude_code, model: claude-sonnet-4-20250514 }
+    backend_dev: { provider: claude_code, model: claude-sonnet-4-20250514 }
+    frontend_dev: { provider: claude_code, model: claude-sonnet-4-20250514 }
+    fullstack_dev: { provider: claude_code, model: claude-sonnet-4-20250514 }
+    devops: { provider: claude_code, model: claude-sonnet-4-20250514 }
+    qa_tester: { provider: ollama, model: llama3.1:70b }
+
+  # Cost saving (cheap)
+  cost_saving:
+    business_analyst: { provider: claude_code, model: claude-sonnet-4-20250514 }
+    uxui_designer: { provider: claude_code, model: claude-sonnet-4-20250514 }
+    security_auditor: { provider: claude_code, model: claude-sonnet-4-20250514 }
+    tech_lead: { provider: claude_code, model: claude-sonnet-4-20250514 }
+    pm: { provider: claude_code, model: claude-3-5-haiku-20241022 }
+    backend_dev: { provider: ollama, model: llama3.1:70b }
+    frontend_dev: { provider: ollama, model: llama3.1:70b }
+    fullstack_dev: { provider: ollama, model: llama3.1:70b }
+    devops: { provider: claude_code, model: claude-3-5-haiku-20241022 }
+    qa_tester: { provider: ollama, model: llama3.1:8b }
+
+  # Local only (free, needs GPU)
+  local_only:
+    _all: { provider: ollama, model: llama3.1:70b }

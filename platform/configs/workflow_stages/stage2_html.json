@@ -1,0 +1,8 @@
+{
+  "model": "qwen2.5-coder:7b",
+  "prompt": "Create a complete, production-ready index.html for TechWave Solutions website.\n\nDesign specs:\n- Primary Color: #3498DB (blue)\n- Secondary Color: #F1C40F (orange-yellow)\n- Font: Open Sans\n- Tagline: Innovating Tomorrow, Today\n\nSections needed:\n1. Navigation (logo + menu)\n2. Hero section (tagline + CTA button)\n3. Services section (4 cards: AI/ML, Cloud, Digital Transform, Software Dev)\n4. About section\n5. Contact form\n6. Footer\n\nRequirements:\n- Semantic HTML5\n- Mobile-friendly viewport\n- Link to css/style.css and js/main.js\n- Use Google Fonts for Open Sans\n\nOutput ONLY the complete HTML code, no explanations.",
+  "stream": false,
+  "options": {
+    "temperature": 0.3
+  }
+}

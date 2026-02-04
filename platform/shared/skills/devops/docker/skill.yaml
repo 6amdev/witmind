@@ -1,0 +1,34 @@
+# Docker DevOps Skill
+skill:
+  id: docker-devops
+  name: "Docker & Container Management"
+  version: "1.0"
+  description: "Docker containerization and orchestration"
+
+  available_to:
+    - devops
+    - backend_dev
+    - fullstack_dev
+
+  triggers:
+    - "docker"
+    - "containerize"
+    - "deployment"
+    - "dockerfile"
+
+  includes:
+    patterns:
+      - "patterns/*.template"
+    docs:
+      - "best-practices.md"
+
+  instructions: |
+    ## Docker Best Practices
+
+    1. **Multi-stage builds** - Minimize image size
+    2. **Non-root user** - Security best practice
+    3. **Health checks** - Container health monitoring
+    4. **Layer optimization** - Cache dependencies first
+    5. **.dockerignore** - Exclude unnecessary files
+    6. **Specific tags** - Never use :latest in production
+    7. **Environment variables** - Configuration via env

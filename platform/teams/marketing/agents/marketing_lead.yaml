@@ -1,0 +1,59 @@
+# Marketing Lead Agent
+
+agent:
+  id: marketing_lead
+  name: "Marketing Lead"
+  team: marketing
+  role: "strategy"
+  description: "วางแผนกลยุทธ์การตลาดและประสานงานทีม"
+  icon: "🎯"
+
+llm:
+  primary:
+    provider: "claude_sonnet"
+  secondary:
+    provider: "ollama"
+    model: "llama3.2"
+    use_for:
+      - "simple analysis"
+      - "data formatting"
+
+capabilities:
+  - marketing_strategy
+  - campaign_planning
+  - competitor_analysis
+  - audience_research
+  - budget_planning
+  - performance_analysis
+
+allowed_tools:
+  - Read
+  - Write
+  - Edit
+  - WebSearch
+
+workflow:
+  watches: "projects/inbox/*marketing*.yaml"
+  inputs:
+    - "SPEC.md"
+  outputs:
+    - "MARKETING_STRATEGY.md"
+    - "CAMPAIGN_PLAN.md"
+  notifies:
+    - content_writer
+    - seo_specialist
+
+prompt_file: "prompts/marketing_lead.md"
+
+behavior:
+  ask_user_when:
+    - "budget allocation"
+    - "target audience changes"
+    - "campaign launch"
+  auto_proceed_when:
+    - "content review"
+    - "analytics report"
+
+limits:
+  max_tokens: 4000
+  timeout_minutes: 30

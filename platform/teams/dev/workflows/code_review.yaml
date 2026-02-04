@@ -1,0 +1,256 @@
+# Code Review & Refactor Workflow
+# สำหรับ review code เก่า แล้วปรับปรุง/สร้างใหม่
+
+workflow:
+  id: code_review
+  name: "Code Review & Refactor"
+  team: dev
+  description: "Review โค้ดเก่า วิเคราะห์ปัญหา แล้วปรับปรุง"
+
+  trigger:
+    type: "manual"
+    command: "wit review <path_or_git_url>"
+
+  # Input ที่ต้องการ
+  inputs:
+    required:
+      - source_path: "path หรือ git URL ของ code เก่า"
+    optional:
+      - focus_areas: "ส่วนที่ต้องการ focus (performance, security, etc.)"
+      - keep_features: "features ที่ต้องคงไว้"
+      - change_requests: "สิ่งที่ต้องการเปลี่ยน"
+
+  stages:
+
+    # ========================================
+    # Stage 1: Code Analysis
+    # ========================================
+    - stage: "analysis"
+      name: "วิเคราะห์โค้ดเก่า"
+      agent: tech_lead
+
+      actions:
+        - clone_or_copy_source     # Clone/copy code มาวิเคราะห์
+        - analyze_structure        # วิเคราะห์โครงสร้าง
+        - identify_tech_stack      # ระบุ tech stack ที่ใช้
+        - document_architecture    # ทำ document architecture เดิม
+        - identify_issues          # ระบุปัญหาที่พบ
+
+      outputs:
+        - "docs/EXISTING_ANALYSIS.md"    # วิเคราะห์ระบบเดิม
+        - "docs/TECH_DEBT.md"            # Technical debt ที่พบ
+        - "docs/CURRENT_ARCHITECTURE.md" # Architecture ปัจจุบัน
+
+      next: "security_review"
+      timeout_minutes: 60
+
+    # ========================================
+    # Stage 2: Security & Quality Review
+    # ========================================
+    - stage: "security_review"
+      name: "ตรวจสอบ Security & Quality"
+      parallel: true
+
+      tasks:
+        - agent: security_auditor
+          actions:
+            - scan_vulnerabilities
+            - check_dependencies
+            - review_auth_flow
+          outputs:
+            - "docs/SECURITY_ISSUES.md"
+
+        - agent: qa_tester
+          actions:
+            - analyze_test_coverage
+            - identify_missing_tests
+            - check_code_quality
+          outputs:
+            - "docs/QUALITY_REPORT.md"
+
+      next: "human_review"
+      timeout_minutes: 45
+
+    # ========================================
+    # Stage 3: Human Review (Approval Gate)
+    # ========================================
+    - stage: "human_review"
+      name: "🔍 Review by Human"
+      type: "approval_gate"
+
+      description: |
+        รอให้ user review analysis results ก่อนไปต่อ:
+        - EXISTING_ANALYSIS.md
+        - TECH_DEBT.md
+        - SECURITY_ISSUES.md
+        - QUALITY_REPORT.md
+
+      present_to_user:
+        - "docs/EXISTING_ANALYSIS.md"
+        - "docs/TECH_DEBT.md"
+        - "docs/SECURITY_ISSUES.md"
+        - "docs/QUALITY_REPORT.md"
+
+      user_actions:
+        - action: "approve"
+          description: "ยืนยัน ไปต่อขั้นตอน Planning"
+          next: "planning"
+
+        - action: "request_more_analysis"
+          description: "ต้องการวิเคราะห์เพิ่ม"
+          next: "analysis"
+          prompt_user: "ต้องการให้วิเคราะห์อะไรเพิ่ม?"
+
+        - action: "add_requirements"
+          description: "เพิ่ม requirements"
+          next: "planning"
+          prompt_user: "มี requirements เพิ่มเติมอะไรบ้าง?"
+
+        - action: "cancel"
+          description: "ยกเลิกโปรเจค"
+          next: "cancelled"
+
+    # ========================================
+    # Stage 4: Refactor Planning
+    # ========================================
+    - stage: "planning"
+      name: "วางแผนการปรับปรุง"
+      agent: tech_lead
+
+      inputs:
+        - "docs/EXISTING_ANALYSIS.md"
+        - "docs/TECH_DEBT.md"
+        - "docs/SECURITY_ISSUES.md"
+        - "user_feedback"              # จาก human_review
+
+      actions:
+        - create_refactor_plan
+        - prioritize_changes
+        - estimate_effort
+        - design_new_architecture
+
+      outputs:
+        - "docs/REFACTOR_PLAN.md"      # แผนการปรับปรุง
+        - "docs/NEW_ARCHITECTURE.md"   # Architecture ใหม่
+        - "docs/MIGRATION_STEPS.md"    # ขั้นตอน migration
+        - "docs/TASKS.md"              # Task breakdown
+
+      next: "plan_approval"
+      timeout_minutes: 60
+
+    # ========================================
+    # Stage 5: Plan Approval (Approval Gate)
+    # ========================================
+    - stage: "plan_approval"
+      name: "🔍 Approve Refactor Plan"
+      type: "approval_gate"
+
+      description: "รอ user approve แผนการปรับปรุงก่อนเริ่มทำ"
+
+      present_to_user:
+        - "docs/REFACTOR_PLAN.md"
+        - "docs/NEW_ARCHITECTURE.md"
+        - "docs/TASKS.md"
+
+      user_actions:
+        - action: "approve"
+          description: "ยืนยัน เริ่มทำได้เลย"
+          next: "development"
+
+        - action: "modify_plan"
+          description: "ต้องการแก้ไขแผน"
+          next: "planning"
+          prompt_user: "ต้องการแก้ไขอะไร?"
+
+        - action: "approve_partial"
+          description: "ทำแค่บางส่วนก่อน"
+          next: "development"
+          prompt_user: "เลือก tasks ที่ต้องการทำ"
+
+    # ========================================
+    # Stage 6: Development
+    # ========================================
+    - stage: "development"
+      name: "พัฒนาระบบใหม่"
+      parallel: true
+
+      tasks:
+        - agent: frontend_dev
+          condition: "has_frontend_changes"
+          task_filter: "frontend/*"
+
+        - agent: backend_dev
+          condition: "has_backend_changes"
+          task_filter: "backend/*"
+
+        - agent: fullstack_dev
+          condition: "is_fullstack"
+          task_filter: "fullstack/*"
+
+      next: "testing"
+      timeout_minutes: 180
+
+    # ========================================
+    # Stage 7: Testing
+    # ========================================
+    - stage: "testing"
+      name: "ทดสอบระบบ"
+      agent: qa_tester
+
+      actions:
+        - run_existing_tests
+        - run_new_tests
+        - compare_with_original
+        - generate_report
+
+      outputs:
+        - "docs/TEST_REPORT.md"
+        - "docs/COMPARISON_REPORT.md"  # เปรียบเทียบกับระบบเดิม
+
+      next:
+        pass: "deployment"
+        fail: "development"
+
+    # ========================================
+    # Stage 8: Deployment
+    # ========================================
+    - stage: "deployment"
+      name: "Deploy ระบบใหม่"
+      agent: devops
+
+      actions:
+        - create_migration_script
+        - deploy_to_staging
+        - run_smoke_tests
+
+      outputs:
+        - "docs/DEPLOY_INFO.md"
+        - "scripts/migrate.sh"
+
+      next: "delivery"
+
+    # ========================================
+    # Stage 9: Delivery
+    # ========================================
+    - stage: "delivery"
+      name: "ส่งมอบงาน"
+      agent: pm
+
+      actions:
+        - create_comparison_summary
+        - document_improvements
+        - create_delivery_report
+
+      outputs:
+        - "docs/DELIVERY.md"
+        - "docs/IMPROVEMENTS_SUMMARY.md"
+
+      on_complete: "move_to_completed"
+
+  notifications:
+    on_approval_needed: true    # แจ้งเมื่อต้องการ approval
+    on_stage_complete: true
+    on_error: true
+    channels:
+      - log
+      - notification           # ส่ง notification ให้ user

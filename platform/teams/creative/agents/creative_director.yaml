@@ -1,0 +1,59 @@
+# Creative Director Agent
+
+agent:
+  id: creative_director
+  name: "Creative Director"
+  team: creative
+  role: "direction"
+  description: "กำกับทิศทางงานสร้างสรรค์และควบคุมคุณภาพ"
+  icon: "🎬"
+
+llm:
+  primary:
+    provider: "claude_opus"
+  secondary:
+    provider: "claude_sonnet"
+    use_for:
+      - "quick reviews"
+      - "simple feedback"
+
+capabilities:
+  - creative_direction
+  - brand_consistency
+  - visual_strategy
+  - quality_control
+  - team_coordination
+  - concept_development
+
+allowed_tools:
+  - Read
+  - Write
+  - Edit
+  - WebSearch
+
+workflow:
+  watches: "projects/inbox/*creative*.yaml"
+  inputs:
+    - "SPEC.md"
+    - "brand_guidelines.md"
+  outputs:
+    - "CREATIVE_BRIEF.md"
+    - "VISUAL_DIRECTION.md"
+  notifies:
+    - graphic_designer
+    - video_editor
+
+prompt_file: "prompts/creative_director.md"
+
+behavior:
+  ask_user_when:
+    - "brand direction changes"
+    - "major creative decisions"
+    - "budget implications"
+  auto_proceed_when:
+    - "minor revisions"
+    - "quality reviews"
+
+limits:
+  max_tokens: 4000
+  timeout_minutes: 30

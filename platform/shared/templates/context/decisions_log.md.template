@@ -1,0 +1,62 @@
+# {{PROJECT_NAME}} - Decisions Log
+
+> บันทึกการตัดสินใจสำคัญของโปรเจค
+
+## วิธีใช้งาน
+
+เมื่อมีการตัดสินใจสำคัญ ให้บันทึกลงที่นี่โดยใช้ format ด้านล่าง:
+1. ระบุ context และ problem
+2. ระบุ options ที่พิจารณา
+3. ระบุ decision และเหตุผล
+4. ระบุผลกระทบ
+
+---
+
+## DEC-001: [Decision Title]
+
+**Date:** {{DATE}}
+**Made by:** {{AGENT_NAME}}
+**Status:** Approved / Pending / Revised
+
+### Context
+[อธิบายสถานการณ์ที่ต้องตัดสินใจ]
+
+### Problem Statement
+[ปัญหาหรือคำถามที่ต้องตอบ]
+
+### Options Considered
+
+| Option | Pros | Cons |
+|--------|------|------|
+| Option A | - Pro 1<br>- Pro 2 | - Con 1<br>- Con 2 |
+| Option B | - Pro 1<br>- Pro 2 | - Con 1<br>- Con 2 |
+| Option C | - Pro 1<br>- Pro 2 | - Con 1<br>- Con 2 |
+
+### Decision
+**Chosen:** Option A
+
+### Rationale
+[ทำไมเลือก option นี้]
+
+### Consequences
+- [ผลกระทบ 1]
+- [ผลกระทบ 2]
+
+### Follow-up Actions
+- [ ] [Action 1]
+- [ ] [Action 2]
+
+---
+
+## DEC-002: [Next Decision]
+
+[Continue with same format...]
+
+---
+
+## Quick Reference
+
+| ID | Decision | Date | By | Impact |
+|----|----------|------|-----|--------|
+| DEC-001 | [Short description] | {{DATE}} | PM | High |
+| DEC-002 | [Short description] | {{DATE}} | Tech Lead | Medium |

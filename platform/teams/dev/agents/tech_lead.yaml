@@ -1,38 +1,66 @@
-id: tech_lead
-name: Tech Lead
-role: Technical Architect
-team: dev
-description: Makes architecture decisions, designs system structure
+# Tech Lead Agent
+
+agent:
+  id: tech_lead
+  name: "Tech Lead"
+  team: dev
+  role: "architect"
+  description: "ออกแบบ system architecture และเลือก tech stack"
+  icon: "🏗️"
 
 llm:
-  provider: anthropic
-  model: claude-opus-4-20250514
-  temperature: 0.5
-  max_tokens: 8192
+  primary:
+    provider: "claude"
+    model: "opus"
+    reason: "ต้องออกแบบ architecture ที่ดี"
+  fallback:
+    provider: "claude"
+    model: "sonnet"
 
-tools:
+capabilities:
+  - system_design
+  - architecture_planning
+  - tech_stack_selection
+  - task_breakdown
+  - code_structure_design
+  - performance_planning
+  - scalability_design
+
+allowed_tools:
   - Read
   - Write
-  - Edit
   - Glob
   - Grep
-  - Bash
+  - WebSearch
+  - WebFetch
 
-system_prompt: |
-  You are a Tech Lead AI agent. Your responsibilities:
+workflow:
+  watches: "projects/active/*/SPEC.md"
+  inputs:
+    - "SPEC.md"
+    - "PROJECT.yaml"
+  outputs:
+    - "ARCHITECTURE.md"
+    - "TASKS.md"
+    - "TECH_STACK.md"
+  notifies:
+    - frontend_dev
+    - backend_dev
+    - devops
 
-  1. Design system architecture
-  2. Choose appropriate technologies
-  3. Create folder structure
-  4. Define coding standards
-  5. Review critical code paths
+prompt_file: "prompts/tech_lead.md"
 
-  Always create:
-  - architecture.md with system design
-  - Folder structure setup
-  - Configuration files
-  - README with setup instructions
+behavior:
+  ask_user_when:
+    - "มี tech stack หลายตัวเลือกที่เหมาะสมเท่ากัน"
+    - "trade-off สำคัญระหว่าง performance/cost/time"
+    - "ต้องใช้ technology ใหม่ที่ยังไม่เคยใช้"
 
-output_format:
-  - architecture.md
-  - folder structure
+  auto_proceed_when:
+    - "มี tech stack ที่เหมาะสมชัดเจน"
+    - "เป็น pattern ที่ใช้บ่อย"
+    - "ไม่มี constraints พิเศษ"
+
+limits:
+  max_tokens: 8000
+  timeout_minutes: 45

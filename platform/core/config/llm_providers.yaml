@@ -1,0 +1,165 @@
+# LLM Providers Configuration
+
+providers:
+
+  # Anthropic Claude
+  claude:
+    type: "anthropic"
+    api_key_env: "ANTHROPIC_API_KEY"
+
+    models:
+      opus:
+        id: "claude-opus-4-5-20251101"
+        max_tokens: 8192
+        cost_per_1k_input: 0.015
+        cost_per_1k_output: 0.075
+        capabilities:
+          - complex_reasoning
+          - architecture_design
+          - strategic_planning
+        use_for:
+          - "requirement analysis"
+          - "architecture design"
+          - "critical decisions"
+          - "complex problem solving"
+
+      sonnet:
+        id: "claude-sonnet-4-20250514"
+        max_tokens: 8192
+        cost_per_1k_input: 0.003
+        cost_per_1k_output: 0.015
+        capabilities:
+          - code_review
+          - testing
+          - documentation
+        use_for:
+          - "code review"
+          - "testing"
+          - "documentation"
+          - "standard implementation"
+
+  # Claude Code CLI (Max Plan)
+  claude_code:
+    type: "cli"
+    command: "claude"
+    auth: "oauth"  # Uses ANTHROPIC_OAUTH_TOKEN
+    unlimited: true
+    capabilities:
+      - file_operations
+      - code_implementation
+      - git_operations
+      - bash_commands
+    use_for:
+      - "code implementation"
+      - "file editing"
+      - "git operations"
+      - "system commands"
+
+  # Ollama (Local)
+  ollama:
+    type: "ollama"
+    url: "http://localhost:11434"
+
+    models:
+      llama3.2:
+        context_length: 8192
+        capabilities:
+          - general_tasks
+          - simple_analysis
+        use_for:
+          - "simple queries"
+          - "boilerplate generation"
+          - "log analysis"
+
+      codellama:
+        context_length: 16384
+        capabilities:
+          - code_completion
+          - simple_refactoring
+        use_for:
+          - "code completion"
+          - "simple code tasks"
+          - "syntax checking"
+
+      mistral:
+        context_length: 8192
+        capabilities:
+          - fast_responses
+        use_for:
+          - "quick responses"
+          - "simple formatting"
+
+  # OpenRouter (External APIs)
+  openrouter:
+    type: "openrouter"
+    api_key_env: "OPENROUTER_API_KEY"
+    base_url: "https://openrouter.ai/api/v1"
+
+    models:
+      # Video Generation
+      runway_gen3:
+        id: "runway/gen-3-alpha"
+        capabilities:
+          - video_generation
+        use_for:
+          - "video generation"
+          - "video editing"
+
+      # Image Generation
+      dall_e_3:
+        id: "openai/dall-e-3"
+        capabilities:
+          - image_generation
+        use_for:
+          - "image generation"
+          - "graphic design"
+
+      # Voice Synthesis
+      elevenlabs:
+        id: "elevenlabs/eleven-multilingual-v2"
+        capabilities:
+          - voice_synthesis
+          - text_to_speech
+        use_for:
+          - "voice over"
+          - "narration"
+          - "audio content"
+
+# Routing Rules
+routing:
+  # Route by task complexity
+  complexity:
+    high:
+      - "claude/opus"
+    medium:
+      - "claude/sonnet"
+      - "claude_code"
+    low:
+      - "ollama/llama3.2"
+      - "ollama/codellama"
+
+  # Route by task type
+  task_type:
+    requirement_analysis: "claude/opus"
+    architecture_design: "claude/opus"
+    code_implementation: "claude_code"
+    code_review: "claude/sonnet"
+    testing: "claude/sonnet"
+    simple_tasks: "ollama/llama3.2"
+    video_generation: "openrouter/runway_gen3"
+    image_generation: "openrouter/dall_e_3"
+    voice_synthesis: "openrouter/elevenlabs"
+
+  # Cost optimization
+  prefer_local: true
+  fallback_chain:
+    - "claude_code"
+    - "claude/sonnet"
+    - "ollama/llama3.2"
+
+# Cost Management
+cost:
+  daily_limit_usd: 50.00
+  warning_threshold_usd: 40.00
+  track_usage: true
+  log_all_requests: true

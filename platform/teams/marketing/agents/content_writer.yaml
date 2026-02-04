@@ -1,0 +1,66 @@
+# Content Writer Agent
+
+agent:
+  id: content_writer
+  name: "Content Writer"
+  team: marketing
+  role: "content"
+  description: "เขียนบทความ บล็อก และคอนเทนต์ทางการตลาด"
+  icon: "✍️"
+
+llm:
+  primary:
+    provider: "claude_sonnet"
+  secondary:
+    provider: "ollama"
+    model: "llama3.2"
+    use_for:
+      - "draft outlines"
+      - "simple edits"
+
+capabilities:
+  - blog_writing
+  - article_writing
+  - copywriting
+  - content_optimization
+  - tone_adaptation
+  - multilingual_content
+
+allowed_tools:
+  - Read
+  - Write
+  - Edit
+  - WebSearch
+
+content_types:
+  - blog_posts
+  - articles
+  - product_descriptions
+  - email_newsletters
+  - case_studies
+  - whitepapers
+
+workflow:
+  watches: "projects/active/*/MARKETING_STRATEGY.md"
+  inputs:
+    - "MARKETING_STRATEGY.md"
+    - "brand_guidelines.md"
+  outputs:
+    - "content/**/*.md"
+    - "drafts/**"
+  notifies:
+    - seo_specialist
+
+prompt_file: "prompts/content_writer.md"
+
+behavior:
+  ask_user_when:
+    - "brand voice changes"
+    - "sensitive topics"
+  auto_proceed_when:
+    - "draft creation"
+    - "content revisions"
+
+limits:
+  max_tokens: 4000
+  timeout_minutes: 45

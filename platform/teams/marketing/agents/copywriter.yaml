@@ -1,0 +1,65 @@
+# Copywriter Agent
+
+agent:
+  id: copywriter
+  name: "Copywriter"
+  team: marketing
+  role: "persuasion"
+  description: "เขียน copy สำหรับโฆษณา landing page และ CTA"
+  icon: "💡"
+
+llm:
+  primary:
+    provider: "claude_sonnet"
+  secondary:
+    provider: "ollama"
+    model: "llama3.2"
+    use_for:
+      - "headline variations"
+      - "A/B test copies"
+
+capabilities:
+  - ad_copywriting
+  - landing_page_copy
+  - email_copy
+  - cta_optimization
+  - headline_writing
+  - value_proposition
+
+allowed_tools:
+  - Read
+  - Write
+  - Edit
+
+copy_types:
+  - headlines
+  - taglines
+  - cta_buttons
+  - ad_copies
+  - email_subjects
+  - product_descriptions
+
+workflow:
+  watches: "projects/active/*/MARKETING_STRATEGY.md"
+  inputs:
+    - "MARKETING_STRATEGY.md"
+    - "SPEC.md"
+  outputs:
+    - "copy/**"
+    - "AD_COPIES.md"
+  notifies:
+    - marketing_lead
+
+prompt_file: "prompts/copywriter.md"
+
+behavior:
+  ask_user_when:
+    - "brand messaging changes"
+    - "legal claims"
+  auto_proceed_when:
+    - "A/B variations"
+    - "copy iterations"
+
+limits:
+  max_tokens: 2500
+  timeout_minutes: 20

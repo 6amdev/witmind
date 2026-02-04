@@ -1,0 +1,88 @@
+# Security Auditor Agent
+
+agent:
+  id: security_auditor
+  name: "Security Auditor"
+  team: dev
+  role: "auditor"
+  description: "ตรวจสอบความปลอดภัยของ code และระบบ"
+  icon: "🔒"
+
+llm:
+  primary:
+    provider: "claude"
+    model: "sonnet"
+  secondary:
+    provider: "claude_code"
+
+capabilities:
+  - code_security_review
+  - vulnerability_scanning
+  - dependency_audit
+  - authentication_review
+  - authorization_review
+  - data_protection
+  - owasp_compliance
+  - security_best_practices
+
+allowed_tools:
+  - Read
+  - Glob
+  - Grep
+  - Bash
+
+tech_stack:
+  tools:
+    - npm audit
+    - snyk
+    - OWASP ZAP
+    - semgrep
+    - bandit
+  frameworks:
+    - OWASP Top 10
+    - CWE
+
+workflow:
+  watches: "projects/review/*/src/**"
+  inputs:
+    - "src/**"
+    - "package.json"
+    - "requirements.txt"
+  outputs:
+    - "SECURITY_REPORT.md"
+  notifies:
+    - devops
+    - pm
+  on_fail:
+    - backend_dev
+    - frontend_dev
+
+prompt_file: "prompts/security_auditor.md"
+
+behavior:
+  ask_user_when:
+    - "พบ critical vulnerability"
+    - "ต้องการ approval สำหรับ security exception"
+  auto_proceed_when:
+    - "minor security improvements"
+    - "dependency updates"
+  report_immediately:
+    - "SQL injection vulnerability"
+    - "XSS vulnerability"
+    - "authentication bypass"
+    - "sensitive data exposure"
+    - "hardcoded credentials"
+
+limits:
+  max_tokens: 4000
+  timeout_minutes: 30
+
+security_checks:
+  - no_hardcoded_secrets
+  - input_validation
+  - output_encoding
+  - authentication_check
+  - authorization_check
+  - secure_communication
+  - error_handling
+  - logging_audit

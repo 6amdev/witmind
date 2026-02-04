@@ -1,25 +1,74 @@
-id: dev
-name: Development Team
-description: Software development agents for coding, testing, and deployment
+# Development Team Configuration
 
-lead: pm_agent
+team:
+  id: dev
+  name: "Development Team"
+  description: "ทีมพัฒนาซอฟต์แวร์ครบวงจร"
+  icon: "💻"
 
-agents:
-  - pm_agent
-  - tech_lead
-  - frontend_dev
-  - backend_dev
-  - fullstack_dev
-  - mobile_dev
-  - qa_engineer
-  - security_analyst
-  - devops_engineer
+  # ประเภทงานที่รับ
+  handles:
+    - web_development
+    - web_static
+    - web_fullstack
+    - mobile_app
+    - api_service
+    - microservice
+    - bug_fix
+    - feature_request
+    - refactoring
+    - performance_optimization
 
-workflow:
-  - pm_agent       # Plan and break down tasks
-  - tech_lead      # Architecture decisions
-  - frontend_dev   # Frontend implementation
-  - backend_dev    # Backend implementation
-  - qa_engineer    # Testing
-  - security_analyst  # Security review
-  - devops_engineer   # Deployment
+  # Agents ในทีม (เรียงตาม hierarchy) - 11 agents
+  agents:
+    - pm                    # Project Manager - รับงาน วิเคราะห์
+    - business_analyst      # Business Analyst - วิเคราะห์ business requirements
+    - tech_lead             # Tech Lead - ออกแบบ architecture
+    - uxui_designer         # UX/UI Designer - ออกแบบ UX/UI
+    - frontend_dev          # Frontend Developer
+    - backend_dev           # Backend Developer
+    - fullstack_dev         # Fullstack Developer
+    - mobile_dev            # Mobile Developer
+    - qa_tester             # QA Tester
+    - security_auditor      # Security Auditor
+    - devops                # DevOps Engineer
+
+  # Default workflow สำหรับทีม
+  default_workflow: "new_project"
+
+  # Workflows ที่มี
+  workflows:
+    - new_project           # โปรเจกต์ใหม่
+    - bug_fix               # แก้ bug
+    - feature_request       # เพิ่ม feature
+    - code_review           # Review code
+    - deployment            # Deploy only
+
+  # Resources ที่ใช้
+  resources:
+    docker_services:
+      - mysql_shared
+      - redis_shared
+      - nginx_proxy
+    storage:
+      active: "ssd"
+      archive: "hdd"
+
+  # Templates ที่ใช้
+  templates:
+    - web_static
+    - web_fullstack
+    - api_service
+    - mobile_app
+
+  # การแจ้งเตือน
+  notifications:
+    on_complete: true
+    on_error: true
+    on_need_input: true
+    on_stage_change: false
+
+  # Limits
+  limits:
+    max_concurrent_projects: 3
+    max_project_size_mb: 500

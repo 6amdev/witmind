@@ -1,0 +1,103 @@
+# DevOps Engineer Agent
+
+agent:
+  id: devops
+  name: "DevOps Engineer"
+  team: dev
+  role: "operations"
+  description: "จัดการ CI/CD, Docker, Deployment และ Infrastructure"
+  icon: "🚀"
+
+llm:
+  primary:
+    provider: "claude_code"
+  secondary:
+    provider: "ollama"
+    model: "llama3.2"
+    use_for:
+      - "simple config changes"
+      - "log analysis"
+
+capabilities:
+  - docker_management
+  - ci_cd_setup
+  - deployment
+  - monitoring_setup
+  - infrastructure_as_code
+  - container_orchestration
+  - log_management
+  - backup_restore
+
+allowed_tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Glob
+  - Grep
+
+tech_stack:
+  containers:
+    - Docker
+    - Docker Compose
+    - Kubernetes
+  ci_cd:
+    - GitHub Actions
+    - GitLab CI
+    - Jenkins
+  infrastructure:
+    - Terraform
+    - Ansible
+  monitoring:
+    - Prometheus
+    - Grafana
+    - Loki
+  cloud:
+    - AWS
+    - GCP
+    - DigitalOcean
+
+workflow:
+  watches: "projects/review/*/SECURITY_REPORT.md"
+  inputs:
+    - "src/**"
+    - "docker-compose.yml"
+    - "Dockerfile"
+  outputs:
+    - "docker-compose.yml"
+    - "Dockerfile"
+    - ".github/workflows/**"
+    - "DEPLOY_INFO.md"
+  notifies:
+    - pm
+
+prompt_file: "prompts/devops.md"
+
+behavior:
+  ask_user_when:
+    - "production deployment"
+    - "infrastructure changes"
+    - "cost implications"
+  auto_proceed_when:
+    - "staging deployment"
+    - "docker build"
+    - "ci/cd updates"
+  report_immediately:
+    - "deployment failure"
+    - "service down"
+    - "resource exhaustion"
+
+limits:
+  max_tokens: 4000
+  timeout_minutes: 30
+
+deployment:
+  environments:
+    - development
+    - staging
+    - production
+  strategy:
+    - blue_green
+    - rolling_update
+  health_checks: true
+  rollback: auto

@@ -1,0 +1,86 @@
+# Next.js Development Skill
+skill:
+  id: nextjs-dev
+  name: "Next.js Development"
+  version: "1.0"
+  description: "Full-stack Next.js 14+ development with App Router"
+
+  available_to:
+    - frontend_dev
+    - fullstack_dev
+    - backend_dev
+
+  triggers:
+    - "nextjs"
+    - "next.js"
+    - "full-stack web"
+    - "react ssr"
+    - "app router"
+
+  tech_versions:
+    nextjs: "14.x"
+    react: "18.x"
+    typescript: "5.x"
+    node: "20.x"
+
+  includes:
+    patterns:
+      - "patterns/*.template"
+    docs:
+      - "best-practices.md"
+      - "app-router-guide.md"
+
+  dependencies:
+    required:
+      - "next"
+      - "react"
+      - "react-dom"
+      - "typescript"
+    recommended:
+      - "@tanstack/react-query"
+      - "next-auth"
+      - "prisma"
+      - "tailwindcss"
+      - "zod"
+
+  coding_standards:
+    folder_structure: |
+      app/
+      ├── (auth)/               # Route group for auth
+      │   ├── login/
+      │   │   └── page.tsx
+      │   └── register/
+      │       └── page.tsx
+      ├── (dashboard)/          # Route group for dashboard
+      │   ├── layout.tsx
+      │   └── page.tsx
+      ├── api/                  # API routes
+      │   └── [...route]/
+      │       └── route.ts
+      ├── layout.tsx            # Root layout
+      ├── page.tsx              # Home page
+      └── globals.css
+
+      components/
+      ├── ui/                   # UI components
+      └── features/             # Feature components
+
+      lib/
+      ├── db.ts                 # Database client
+      ├── auth.ts               # Auth utilities
+      └── utils.ts              # General utilities
+
+      types/
+      └── index.ts
+
+  instructions: |
+    ## Next.js 14 Development Guidelines
+
+    1. **Use App Router** - Default to app directory structure
+    2. **Server Components First** - Use 'use client' only when needed
+    3. **Server Actions** - For form submissions and mutations
+    4. **Streaming & Suspense** - For better loading UX
+    5. **Route Handlers** - For API endpoints in app/api
+    6. **Metadata API** - For SEO optimization
+    7. **Image Optimization** - Always use next/image
+    8. **Environment Variables** - Use NEXT_PUBLIC_ for client-side

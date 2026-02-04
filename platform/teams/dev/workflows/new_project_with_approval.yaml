@@ -1,0 +1,332 @@
+# New Project Workflow with Human Approval Gates
+# สำหรับโปรเจคที่ต้องการให้ user review ทุกขั้นตอน
+
+workflow:
+  id: new_project_with_approval
+  name: "New Project (with Human Checkpoints)"
+  team: dev
+  description: "สร้างโปรเจกต์ใหม่ โดยมี checkpoints ให้ user review"
+
+  trigger:
+    type: "manual"
+    command: "wit new --with-approval \"description\""
+
+  # ระบุว่ามี approval gates
+  approval_mode: true
+
+  stages:
+
+    # ========================================
+    # Stage 1: รับงานและวิเคราะห์
+    # ========================================
+    - stage: "intake"
+      name: "รับงานและวิเคราะห์"
+      agent: pm
+
+      actions:
+        - read_request
+        - analyze_requirements
+        - create_spec
+
+      outputs:
+        - "docs/SPEC.md"
+        - "PROJECT.yaml"
+
+      next: "spec_approval"
+      timeout_minutes: 30
+
+    # ========================================
+    # Stage 2: ⏸️ Approval - SPEC
+    # ========================================
+    - stage: "spec_approval"
+      name: "🔍 Review SPEC.md"
+      type: "approval_gate"
+
+      description: |
+        กรุณา review SPEC.md ที่ PM สร้าง:
+        - Requirements ถูกต้องครบถ้วนหรือไม่
+        - User stories ครอบคลุมหรือไม่
+        - มีอะไรขาดหายหรือไม่
+
+      present_to_user:
+        - "docs/SPEC.md"
+        - "PROJECT.yaml"
+
+      user_actions:
+        - action: "approve"
+          description: "SPEC ถูกต้อง ไปขั้นตอน Design ได้"
+          next: "design"
+
+        - action: "request_changes"
+          description: "ต้องการแก้ไข SPEC"
+          next: "intake"
+          prompt_user: "ต้องการแก้ไขอะไรบ้าง?"
+
+        - action: "add_requirements"
+          description: "เพิ่ม requirements"
+          next: "intake"
+          prompt_user: "มี requirements เพิ่มเติมอะไรบ้าง?"
+
+    # ========================================
+    # Stage 3: ออกแบบ Architecture
+    # ========================================
+    - stage: "design"
+      name: "ออกแบบ Architecture"
+      agent: tech_lead
+
+      inputs:
+        - "docs/SPEC.md"
+        - "user_feedback"  # feedback จาก approval (ถ้ามี)
+
+      actions:
+        - design_architecture
+        - select_tech_stack
+        - create_tasks
+
+      outputs:
+        - "docs/ARCHITECTURE.md"
+        - "docs/TASKS.md"
+        - "docs/TECH_STACK.md"
+
+      next: "design_approval"
+      timeout_minutes: 45
+
+    # ========================================
+    # Stage 4: ⏸️ Approval - Design
+    # ========================================
+    - stage: "design_approval"
+      name: "🔍 Review Architecture"
+      type: "approval_gate"
+
+      description: |
+        กรุณา review Architecture ที่ Tech Lead ออกแบบ:
+        - Tech stack เหมาะสมหรือไม่
+        - Architecture รองรับ requirements หรือไม่
+        - มี concerns อะไรบ้าง
+
+      present_to_user:
+        - "docs/ARCHITECTURE.md"
+        - "docs/TECH_STACK.md"
+        - "docs/TASKS.md"
+
+      user_actions:
+        - action: "approve"
+          description: "Design ดี เริ่ม Development ได้"
+          next: "development"
+
+        - action: "modify_design"
+          description: "ต้องการแก้ไข Design"
+          next: "design"
+          prompt_user: "ต้องการแก้ไขอะไร?"
+
+        - action: "change_tech_stack"
+          description: "เปลี่ยน Tech Stack"
+          next: "design"
+          prompt_user: "ต้องการใช้ tech อะไรแทน?"
+
+    # ========================================
+    # Stage 5: พัฒนาระบบ
+    # ========================================
+    - stage: "development"
+      name: "พัฒนาระบบ"
+      parallel: true
+
+      tasks:
+        - agent: frontend_dev
+          condition: "has_frontend"
+          task_filter: "frontend/*"
+
+        - agent: backend_dev
+          condition: "has_backend"
+          task_filter: "backend/*"
+
+        - agent: fullstack_dev
+          condition: "is_fullstack"
+          task_filter: "fullstack/*"
+
+      # Optional: checkpoint หลัง development
+      checkpoint:
+        enabled: true
+        on: "task_complete"
+        message: "Feature {{task_name}} เสร็จแล้ว ต้องการ review หรือไม่?"
+        actions:
+          - review_now
+          - continue
+
+      next: "testing"
+      timeout_minutes: 120
+
+    # ========================================
+    # Stage 6: ทดสอบระบบ
+    # ========================================
+    - stage: "testing"
+      name: "ทดสอบระบบ"
+      agent: qa_tester
+
+      actions:
+        - run_unit_tests
+        - run_integration_tests
+        - run_e2e_tests
+        - generate_report
+
+      outputs:
+        - "tests/**"
+        - "docs/TEST_REPORT.md"
+
+      next: "test_approval"
+      timeout_minutes: 45
+
+    # ========================================
+    # Stage 7: ⏸️ Approval - Test Results
+    # ========================================
+    - stage: "test_approval"
+      name: "🔍 Review Test Results"
+      type: "approval_gate"
+
+      description: |
+        กรุณา review ผลการทดสอบ:
+        - Test coverage เพียงพอหรือไม่
+        - มี bugs ที่ต้องแก้ก่อน deploy หรือไม่
+
+      present_to_user:
+        - "docs/TEST_REPORT.md"
+
+      user_actions:
+        - action: "approve"
+          description: "Tests ผ่าน ไป Security Audit"
+          next: "security"
+
+        - action: "fix_bugs"
+          description: "มี bugs ต้องแก้"
+          next: "development"
+          prompt_user: "bugs ที่ต้องแก้:"
+
+        - action: "add_tests"
+          description: "ต้องการ tests เพิ่ม"
+          next: "testing"
+          prompt_user: "ต้องการ test อะไรเพิ่ม?"
+
+    # ========================================
+    # Stage 8: Security Audit
+    # ========================================
+    - stage: "security"
+      name: "ตรวจสอบความปลอดภัย"
+      agent: security_auditor
+
+      actions:
+        - code_review
+        - dependency_audit
+        - vulnerability_scan
+
+      outputs:
+        - "docs/SECURITY_REPORT.md"
+
+      next: "security_approval"
+      timeout_minutes: 30
+
+    # ========================================
+    # Stage 9: ⏸️ Approval - Security
+    # ========================================
+    - stage: "security_approval"
+      name: "🔍 Review Security Report"
+      type: "approval_gate"
+
+      description: |
+        กรุณา review Security Report:
+        - มี vulnerabilities ที่ต้องแก้ไขก่อน deploy หรือไม่
+        - ยอมรับ risks ที่เหลือได้หรือไม่
+
+      present_to_user:
+        - "docs/SECURITY_REPORT.md"
+
+      user_actions:
+        - action: "approve"
+          description: "Security OK, ไป Deploy"
+          next: "deployment"
+
+        - action: "fix_security"
+          description: "ต้องแก้ security issues ก่อน"
+          next: "development"
+          prompt_user: "issues ที่ต้องแก้:"
+
+        - action: "accept_risk"
+          description: "รับทราบ risks, ไปต่อได้"
+          next: "deployment"
+          prompt_user: "เหตุผลที่ยอมรับ risk:"
+
+    # ========================================
+    # Stage 10: Deployment
+    # ========================================
+    - stage: "deployment"
+      name: "Deploy ระบบ"
+      agent: devops
+
+      actions:
+        - create_dockerfile
+        - build_image
+        - deploy_staging
+        - run_smoke_tests
+
+      outputs:
+        - "Dockerfile"
+        - "docker-compose.yml"
+        - "docs/DEPLOY_INFO.md"
+
+      next: "deploy_approval"
+      timeout_minutes: 30
+
+    # ========================================
+    # Stage 11: ⏸️ Approval - Deploy to Production
+    # ========================================
+    - stage: "deploy_approval"
+      name: "🔍 Approve Production Deploy"
+      type: "approval_gate"
+
+      description: |
+        ระบบพร้อม deploy production:
+        - Staging URL: {{STAGING_URL}}
+        - กรุณาทดสอบบน staging ก่อน approve
+
+      present_to_user:
+        - "docs/DEPLOY_INFO.md"
+        - "docs/TEST_REPORT.md"
+        - "docs/SECURITY_REPORT.md"
+
+      user_actions:
+        - action: "deploy_production"
+          description: "✅ Deploy to Production"
+          next: "delivery"
+
+        - action: "staging_only"
+          description: "ใช้ Staging ก่อน, ยังไม่ deploy production"
+          next: "delivery"
+
+        - action: "rollback"
+          description: "พบปัญหา, ต้องแก้ไข"
+          next: "development"
+          prompt_user: "ปัญหาที่พบ:"
+
+    # ========================================
+    # Stage 12: ส่งมอบงาน
+    # ========================================
+    - stage: "delivery"
+      name: "ส่งมอบงาน"
+      agent: pm
+
+      actions:
+        - final_review
+        - create_delivery_report
+        - notify_client
+
+      outputs:
+        - "docs/DELIVERY.md"
+
+      on_complete: "move_to_completed"
+
+  notifications:
+    on_approval_needed: true
+    on_stage_complete: false
+    on_error: true
+    channels:
+      - log
+      - notification

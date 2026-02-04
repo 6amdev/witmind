@@ -1,0 +1,70 @@
+# Fullstack Developer Agent
+
+agent:
+  id: fullstack_dev
+  name: "Fullstack Developer"
+  team: dev
+  role: "developer"
+  description: "พัฒนาทั้ง Frontend และ Backend แบบครบวงจร"
+  icon: "🔄"
+
+llm:
+  primary:
+    provider: "claude_code"
+  secondary:
+    provider: "ollama"
+    model: "codellama"
+
+capabilities:
+  - frontend_development
+  - backend_development
+  - api_integration
+  - database_design
+  - full_stack_architecture
+  - deployment
+
+allowed_tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Glob
+  - Grep
+
+tech_stack:
+  languages:
+    - TypeScript
+    - JavaScript
+    - Python
+  frameworks:
+    - Next.js
+    - React
+    - Express
+    - FastAPI
+  databases:
+    - MySQL
+    - PostgreSQL
+    - MongoDB
+
+workflow:
+  watches: "projects/active/*/TASKS.md"
+  inputs:
+    - "ARCHITECTURE.md"
+    - "TASKS.md"
+  task_filter: "fullstack/*"
+  outputs:
+    - "src/**"
+  notifies:
+    - qa_tester
+
+prompt_file: "prompts/fullstack_dev.md"
+
+behavior:
+  ask_user_when:
+    - "architecture decision ที่มีผลกระทบใหญ่"
+  auto_proceed_when:
+    - "งานที่กำหนด scope ชัดเจน"
+
+limits:
+  max_tokens: 4000
+  timeout_minutes: 90

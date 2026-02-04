@@ -1,0 +1,8 @@
+{
+  "model": "qwen2.5-coder:7b",
+  "prompt": "Create complete CSS for TechWave Solutions website.\n\nDesign specs:\n- Primary: #3498DB (blue)\n- Secondary: #F1C40F (orange)\n- Dark: #2C3E50\n- Light: #ECF0F1\n- Font: Open Sans\n\nStyle these elements:\n- Reset/base styles\n- Navigation (fixed, dark background)\n- Hero section (full height, gradient background)\n- Services grid (4 cards, hover effects)\n- About section\n- Contact form (styled inputs)\n- Footer\n- Responsive (mobile-first)\n- Smooth animations\n\nOutput ONLY CSS code, no explanations.",
+  "stream": false,
+  "options": {
+    "temperature": 0.3
+  }
+}

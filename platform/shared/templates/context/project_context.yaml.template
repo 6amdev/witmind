@@ -1,0 +1,79 @@
+# Project Context
+# This file contains project-specific information that all agents should know
+
+project:
+  id: "{{PROJECT_ID}}"
+  name: "{{PROJECT_NAME}}"
+  type: "{{PROJECT_TYPE}}"  # web_static, web_fullstack, mobile_app, api_service
+
+# Client Information
+client:
+  name: "{{CLIENT_NAME}}"
+  industry: "{{INDUSTRY}}"
+  communication_style: "{{FORMAL_OR_CASUAL}}"
+  decision_maker: "{{WHO_APPROVES}}"
+  preferences:
+    - "{{PREFERENCE_1}}"
+  dislikes:
+    - "{{DISLIKE_1}}"
+
+# Technical Constraints
+constraints:
+  budget: "{{BUDGET_RANGE}}"
+  timeline: "{{DEADLINE_OR_DURATION}}"
+  hosting:
+    requirement: "{{HOSTING_REQUIREMENT}}"
+    provider: "{{PREFERRED_PROVIDER}}"
+  technology:
+    must_use:
+      - "{{REQUIRED_TECH}}"
+    cannot_use:
+      - "{{FORBIDDEN_TECH}}"
+    reason: "{{WHY_THESE_CONSTRAINTS}}"
+
+# Business Rules
+business_rules:
+  - rule: "{{RULE_1}}"
+    reason: "{{WHY}}"
+  - rule: "{{RULE_2}}"
+    reason: "{{WHY}}"
+
+# External Dependencies
+external_systems:
+  - name: "{{SYSTEM_NAME}}"
+    type: "{{API_OR_SERVICE}}"
+    documentation: "{{DOC_URL}}"
+    credentials_location: "{{WHERE_TO_FIND}}"
+
+# Branding
+branding:
+  primary_color: "{{HEX_COLOR}}"
+  secondary_color: "{{HEX_COLOR}}"
+  fonts:
+    heading: "{{FONT_NAME}}"
+    body: "{{FONT_NAME}}"
+  tone_of_voice: "{{PROFESSIONAL_FRIENDLY_ETC}}"
+  logo_location: "{{PATH_TO_LOGO}}"
+
+# Previous Work
+history:
+  previous_version: "{{LINK_OR_NONE}}"
+  why_rebuilding: "{{REASON}}"
+  keep_from_old:
+    - "{{WHAT_TO_KEEP}}"
+  change_from_old:
+    - "{{WHAT_TO_CHANGE}}"
+
+# Success Criteria
+success_metrics:
+  - metric: "{{METRIC_NAME}}"
+    target: "{{TARGET_VALUE}}"
+    measurement: "{{HOW_TO_MEASURE}}"
+
+# Notes
+notes:
+  important: |
+    {{IMPORTANT_NOTES}}
+
+  gotchas: |
+    {{THINGS_TO_WATCH_OUT_FOR}}

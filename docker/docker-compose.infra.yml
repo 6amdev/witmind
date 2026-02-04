@@ -1,0 +1,38 @@
+networks:
+  frontend:
+    external: true
+  backend:
+    external: true
+
+volumes:
+  mongodb_data:
+  caddy_data:
+  caddy_config:
+
+services:
+  mongodb:
+    image: mongo:8
+    container_name: mongodb
+    restart: unless-stopped
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongodb/mongo-keyfile:/etc/mongo-keyfile:ro
+    networks:
+      - backend
+    command: ["--replSet", "rs0", "--bind_ip_all", "--keyFile", "/etc/mongo-keyfile"]
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - frontend
+      - backend

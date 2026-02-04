@@ -1,0 +1,74 @@
+# LLM Router Configuration
+# Copy to ~/.6amdev/llm_config.yaml
+
+# Provider Options:
+#   - claude_code: Claude Code CLI (default, recommended)
+#   - openrouter: OpenRouter API (cloud, multiple models)
+#   - ollama: Ollama (local, free)
+
+# ===========================================
+# Option 1: Claude Code (Default)
+# ===========================================
+provider: claude_code
+model: claude-sonnet-4-20250514
+# Alternative models:
+#   - claude-opus-4-20250514 (most powerful)
+#   - claude-3-5-haiku-20241022 (fastest, cheapest)
+
+# ===========================================
+# Option 2: OpenRouter (Cloud API)
+# ===========================================
+# provider: openrouter
+# model: anthropic/claude-3.5-sonnet
+# config:
+#   api_key: ${OPENROUTER_API_KEY}  # or set directly
+#
+# Popular OpenRouter models:
+#   - anthropic/claude-3.5-sonnet (recommended)
+#   - anthropic/claude-3-opus
+#   - openai/gpt-4-turbo
+#   - meta-llama/llama-3.1-405b-instruct
+#   - google/gemini-pro-1.5
+#   - deepseek/deepseek-coder
+#   - mistralai/mixtral-8x22b-instruct
+
+# ===========================================
+# Option 3: Ollama (Local, Free)
+# ===========================================
+# provider: ollama
+# model: llama3.1:70b
+# config:
+#   host: http://localhost:11434
+#
+# Recommended Ollama models for coding:
+#   - llama3.1:70b (best quality, needs 48GB+ VRAM)
+#   - llama3.1:8b (fast, needs 8GB VRAM)
+#   - codellama:34b (code specialized)
+#   - deepseek-coder:33b (code specialized)
+#   - qwen2:72b (good for code)
+#   - mixtral:8x7b (balanced)
+
+# ===========================================
+# Advanced Settings
+# ===========================================
+settings:
+  timeout: 300  # seconds
+  max_tokens: 4096
+  temperature: 0.7
+
+  # Fallback chain (if primary fails)
+  fallback_providers:
+    - openrouter
+    - ollama
+
+  # Model selection per task type
+  task_models:
+    coding:
+      provider: claude_code
+      model: claude-sonnet-4-20250514
+    documentation:
+      provider: openrouter
+      model: anthropic/claude-3.5-sonnet
+    quick_tasks:
+      provider: ollama
+      model: llama3.1:8b

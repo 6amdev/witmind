@@ -1,0 +1,93 @@
+# Ollama-Only Agent Configuration
+# Uses only local Ollama models (FREE, needs GPU)
+# Available models on server:
+#   - llama3:latest (8B) - General purpose
+#   - deepseek-r1:8b (8.2B) - Reasoning/Analysis
+#   - qwen2.5-coder:7b (7.6B) - Coding specialized
+
+defaults:
+  provider: ollama
+  host: http://192.168.80.203:11434
+  temperature: 0.5
+  max_tokens: 4096
+  timeout: 300
+
+agents:
+  # === Analysis Roles (Use Reasoning Model) ===
+  business_analyst:
+    provider: ollama
+    model: deepseek-r1:8b
+    temperature: 0.5
+    reason: "BA needs deep reasoning for requirements analysis"
+
+  uxui_designer:
+    provider: ollama
+    model: llama3:latest
+    temperature: 0.7
+    reason: "UX needs creativity"
+
+  security_auditor:
+    provider: ollama
+    model: deepseek-r1:8b
+    temperature: 0.3
+    reason: "Security needs thorough reasoning"
+
+  # === Management Roles (Use General Model) ===
+  pm:
+    provider: ollama
+    model: llama3:latest
+    temperature: 0.5
+    reason: "PM handles coordination and planning"
+
+  tech_lead:
+    provider: ollama
+    model: deepseek-r1:8b
+    temperature: 0.4
+    reason: "Tech lead needs architectural reasoning"
+
+  # === Development Roles (Use Coding Model) ===
+  backend_dev:
+    provider: ollama
+    model: qwen2.5-coder:7b
+    temperature: 0.4
+    reason: "Backend development, code specialized"
+
+  frontend_dev:
+    provider: ollama
+    model: qwen2.5-coder:7b
+    temperature: 0.4
+    reason: "Frontend development, code specialized"
+
+  fullstack_dev:
+    provider: ollama
+    model: qwen2.5-coder:7b
+    temperature: 0.4
+    reason: "Fullstack development, code specialized"
+
+  devops:
+    provider: ollama
+    model: qwen2.5-coder:7b
+    temperature: 0.3
+    reason: "DevOps needs precise configuration"
+
+  qa_tester:
+    provider: ollama
+    model: llama3:latest
+    temperature: 0.3
+    reason: "QA testing is mechanical, general model works"
+
+# Model selection rationale:
+# ┌──────────────────┬─────────────────┬──────────────────────────────┐
+# │ Role             │ Model           │ Why                          │
+# ├──────────────────┼─────────────────┼──────────────────────────────┤
+# │ business_analyst │ deepseek-r1:8b  │ Complex reasoning for BRD    │
+# │ uxui_designer    │ llama3:latest   │ Creative flexibility         │
+# │ security_auditor │ deepseek-r1:8b  │ Deep security reasoning      │
+# │ pm               │ llama3:latest   │ General coordination         │
+# │ tech_lead        │ deepseek-r1:8b  │ Architecture decisions       │
+# │ backend_dev      │ qwen2.5-coder   │ Code generation focus        │
+# │ frontend_dev     │ qwen2.5-coder   │ Code generation focus        │
+# │ fullstack_dev    │ qwen2.5-coder   │ Code generation focus        │
+# │ devops           │ qwen2.5-coder   │ Config/script generation     │
+# │ qa_tester        │ llama3:latest   │ Test case generation         │
+# └──────────────────┴─────────────────┴──────────────────────────────┘

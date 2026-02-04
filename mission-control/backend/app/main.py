@@ -1,63 +1,152 @@
 """
-Mission Control Backend API
+Mission Control v2 - Main Application
 """
+import socketio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import socketio
+from contextlib import asynccontextmanager
 
-app = FastAPI(
-    title="Mission Control API",
-    description="Witmind AI Agent Platform API",
-    version="1.0.0"
+from .config import settings
+from .database import connect_db, disconnect_db
+from .routes import projects_router, tasks_router, agents_router, activities_router, approvals_router
+
+
+# Socket.io server
+sio = socketio.AsyncServer(
+    async_mode="asgi",
+    cors_allowed_origins=settings.CORS_ORIGINS,
 )
 
-# CORS
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan - startup and shutdown"""
+    # Startup
+    print("🚀 Starting Mission Control v2...")
+    await connect_db()
+    yield
+    # Shutdown
+    await disconnect_db()
+    print("👋 Mission Control v2 stopped")
+
+
+# FastAPI app
+app = FastAPI(
+    title=settings.APP_NAME,
+    description="AI Agent Task Management System",
+    version="2.0.0",
+    lifespan=lifespan,
+)
+
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Socket.io
-sio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins='*')
-socket_app = socketio.ASGIApp(sio, app)
+# Include routers
+app.include_router(projects_router)
+app.include_router(tasks_router)
+app.include_router(agents_router)
+app.include_router(activities_router)
+app.include_router(approvals_router)
 
 
+# Health check
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "service": settings.APP_NAME}
+
+
+# Root
 @app.get("/")
 async def root():
-    return {"status": "ok", "service": "Mission Control API"}
+    return {
+        "name": settings.APP_NAME,
+        "version": "2.0.0",
+        "docs": "/docs",
+    }
 
 
-@app.get("/health")
-async def health():
-    return {"status": "healthy"}
-
-
-@app.get("/api/agents")
-async def list_agents():
-    """List all available agents"""
-    # TODO: Load from agent YAML files
-    return {"agents": []}
-
-
-@app.get("/api/projects")
-async def list_projects():
-    """List all projects"""
-    # TODO: Load from database
-    return {"projects": []}
-
+# =============================================================================
+# Socket.io Events
+# =============================================================================
 
 @sio.event
 async def connect(sid, environ):
-    print(f"Client connected: {sid}")
+    """Client connected"""
+    print(f"🔌 Client connected: {sid}")
 
 
 @sio.event
 async def disconnect(sid):
-    print(f"Client disconnected: {sid}")
+    """Client disconnected"""
+    print(f"🔌 Client disconnected: {sid}")
 
 
-# Export for uvicorn
-app = socket_app
+@sio.event
+async def join_project(sid, data):
+    """Join a project room for real-time updates"""
+    project_id = data.get("project_id")
+    if project_id:
+        sio.enter_room(sid, f"project:{project_id}")
+        print(f"📁 {sid} joined project:{project_id}")
+
+
+@sio.event
+async def leave_project(sid, data):
+    """Leave a project room"""
+    project_id = data.get("project_id")
+    if project_id:
+        sio.leave_room(sid, f"project:{project_id}")
+        print(f"📁 {sid} left project:{project_id}")
+
+
+# =============================================================================
+# Helper functions for broadcasting events
+# =============================================================================
+
+async def broadcast_task_update(project_id: str, task: dict):
+    """Broadcast task update to project room"""
+    await sio.emit("task:update", {"task": task}, room=f"project:{project_id}")
+
+
+async def broadcast_activity(project_id: str, activity: dict):
+    """Broadcast new activity to project room"""
+    await sio.emit("activity:new", {"activity": activity}, room=f"project:{project_id}")
+
+
+async def broadcast_agent_status(agent_id: str, status: str, task_id: str = None):
+    """Broadcast agent status change"""
+    await sio.emit("agent:status", {
+        "agent_id": agent_id,
+        "status": status,
+        "task_id": task_id,
+    })
+
+
+async def broadcast_agent_output(agent_id: str, task_id: str, output: str):
+    """Broadcast agent output (streaming)"""
+    await sio.emit("agent:output", {
+        "agent_id": agent_id,
+        "task_id": task_id,
+        "output": output,
+    })
+
+
+# Mount Socket.io
+socket_app = socketio.ASGIApp(sio, app)
+
+
+# For running with uvicorn directly
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "app.main:socket_app",
+        host="0.0.0.0",
+        port=4000,
+        reload=True,
+    )

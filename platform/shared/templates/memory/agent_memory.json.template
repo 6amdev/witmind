@@ -1,0 +1,79 @@
+{
+  "agent_id": "{{AGENT_ID}}",
+  "agent_name": "{{AGENT_NAME}}",
+  "project_id": "{{PROJECT_ID}}",
+  "created_at": "{{CREATED_AT}}",
+  "updated_at": "{{UPDATED_AT}}",
+
+  "context": {
+    "role_in_project": "{{ROLE_DESCRIPTION}}",
+    "assigned_tasks": [],
+    "completed_tasks": []
+  },
+
+  "decisions": [
+    {
+      "id": "DEC-001",
+      "date": "{{DATE}}",
+      "topic": "{{TOPIC}}",
+      "options_considered": [
+        {
+          "option": "{{OPTION_A}}",
+          "pros": ["{{PRO_1}}"],
+          "cons": ["{{CON_1}}"]
+        }
+      ],
+      "decision": "{{CHOSEN_OPTION}}",
+      "reasoning": "{{WHY_THIS_CHOICE}}",
+      "impact": "{{WHAT_IT_AFFECTS}}"
+    }
+  ],
+
+  "learnings": [
+    {
+      "id": "LRN-001",
+      "date": "{{DATE}}",
+      "category": "{{CATEGORY}}",
+      "issue": "{{PROBLEM_ENCOUNTERED}}",
+      "solution": "{{HOW_SOLVED}}",
+      "files_affected": ["{{FILE_PATH}}"],
+      "lesson": "{{WHAT_TO_REMEMBER}}"
+    }
+  ],
+
+  "preferences": {
+    "coding_style": {
+      "naming_convention": "{{CONVENTION}}",
+      "error_handling": "{{APPROACH}}",
+      "testing_approach": "{{APPROACH}}"
+    },
+    "communication_notes": "{{NOTES_ABOUT_CLIENT_OR_TEAM}}"
+  },
+
+  "todos": [
+    {
+      "id": "TODO-001",
+      "description": "{{TODO_DESCRIPTION}}",
+      "priority": "high|medium|low",
+      "status": "pending|in_progress|done",
+      "created_at": "{{DATE}}"
+    }
+  ],
+
+  "blockers": [
+    {
+      "id": "BLK-001",
+      "description": "{{BLOCKER_DESCRIPTION}}",
+      "impact": "{{WHAT_IS_BLOCKED}}",
+      "needs": "{{WHAT_IS_NEEDED}}",
+      "status": "open|resolved",
+      "created_at": "{{DATE}}"
+    }
+  ],
+
+  "handoff_notes": {
+    "for_next_agent": "{{NOTES_FOR_NEXT_STAGE}}",
+    "assumptions_made": ["{{ASSUMPTION_1}}"],
+    "warnings": ["{{WARNING_1}}"]
+  }
+}

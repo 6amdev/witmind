@@ -1,0 +1,88 @@
+# Template D: Speed Focus
+# ใช้ llama3 ทุก agent เพื่อความเร็ว (model เดียว = ไม่ต้อง switch)
+#
+# ┌─────────────────────────────────────────────────────────┐
+# │              TEMPLATE D: SPEED FOCUS                    │
+# ├─────────────────────────────────────────────────────────┤
+# │                                                         │
+# │   Agent              Model              Reason          │
+# │   ─────────────────────────────────────────────────     │
+# │   business_analyst   llama3:latest      Same model      │
+# │   uxui_designer      llama3:latest      Same model      │
+# │   tech_lead          llama3:latest      Same model      │
+# │   pm                 llama3:latest      Same model      │
+# │   backend_dev        llama3:latest      Same model      │
+# │   frontend_dev       llama3:latest      Same model      │
+# │   fullstack_dev      llama3:latest      Same model      │
+# │   devops             llama3:latest      Same model      │
+# │   qa_tester          llama3:latest      Same model      │
+# │   security_auditor   llama3:latest      Same model      │
+# │                                                         │
+# │   ⚡ All agents use llama3:latest                       │
+# │   ⚡ No model switching = faster execution              │
+# │   ⚡ Model stays loaded in VRAM                         │
+# └─────────────────────────────────────────────────────────┘
+
+preset_name: ollama_speed
+description: "Speed-focused configuration using single model"
+
+defaults:
+  provider: ollama
+  host: http://192.168.80.203:11434
+  model: llama3:latest  # Single model for all
+  temperature: 0.4
+  timeout: 120  # Shorter timeout
+
+agents:
+  business_analyst:
+    model: llama3:latest
+    temperature: 0.5
+
+  uxui_designer:
+    model: llama3:latest
+    temperature: 0.6
+
+  tech_lead:
+    model: llama3:latest
+    temperature: 0.4
+
+  pm:
+    model: llama3:latest
+    temperature: 0.5
+
+  backend_dev:
+    model: llama3:latest
+    temperature: 0.3
+
+  frontend_dev:
+    model: llama3:latest
+    temperature: 0.3
+
+  fullstack_dev:
+    model: llama3:latest
+    temperature: 0.3
+
+  devops:
+    model: llama3:latest
+    temperature: 0.2
+
+  qa_tester:
+    model: llama3:latest
+    temperature: 0.3
+
+  security_auditor:
+    model: llama3:latest
+    temperature: 0.2
+
+# Best for:
+#   ✅ Quick prototypes
+#   ✅ Simple projects
+#   ✅ Testing workflow
+#   ✅ Learning/experimenting
+#   ❌ Production code (quality may vary)
+#   ❌ Complex projects (use Template B or C)
+
+# Performance note:
+#   Using single model means no VRAM reload between agents
+#   First agent loads model (~30-40 seconds)
+#   Subsequent agents run immediately

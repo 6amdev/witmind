@@ -1,0 +1,93 @@
+# Template C: Balanced (Default local_only)
+# ผสมผสาน model ตามความเหมาะสมของแต่ละ role
+#
+# ┌─────────────────────────────────────────────────────────┐
+# │              TEMPLATE C: BALANCED MIX                   │
+# ├─────────────────────────────────────────────────────────┤
+# │                                                         │
+# │   Agent              Model              Reason          │
+# │   ─────────────────────────────────────────────────     │
+# │   business_analyst   deepseek-r1:8b     Analysis        │
+# │   uxui_designer      llama3:latest      Creative        │
+# │   tech_lead          deepseek-r1:8b     Architecture    │
+# │   pm                 llama3:latest      Coordination    │
+# │   backend_dev        qwen2.5-coder:7b   Code            │
+# │   frontend_dev       qwen2.5-coder:7b   Code            │
+# │   fullstack_dev      qwen2.5-coder:7b   Code            │
+# │   devops             qwen2.5-coder:7b   Config          │
+# │   qa_tester          llama3:latest      Testing         │
+# │   security_auditor   deepseek-r1:8b     Security        │
+# │                                                         │
+# │   Model Distribution:                                   │
+# │     deepseek-r1:8b    → 3 agents (analysis roles)       │
+# │     qwen2.5-coder:7b  → 4 agents (coding roles)         │
+# │     llama3:latest     → 3 agents (general roles)        │
+# └─────────────────────────────────────────────────────────┘
+
+preset_name: local_only
+description: "Balanced configuration using all available models"
+
+defaults:
+  provider: ollama
+  host: http://192.168.80.203:11434
+  timeout: 300
+
+agents:
+  # Analysis roles → deepseek-r1 (reasoning)
+  business_analyst:
+    model: deepseek-r1:8b
+    temperature: 0.4
+    reason: "Needs deep analysis for requirements"
+
+  tech_lead:
+    model: deepseek-r1:8b
+    temperature: 0.3
+    reason: "Architecture decisions need reasoning"
+
+  security_auditor:
+    model: deepseek-r1:8b
+    temperature: 0.2
+    reason: "Security analysis needs thoroughness"
+
+  # Coding roles → qwen2.5-coder (code specialized)
+  backend_dev:
+    model: qwen2.5-coder:7b
+    temperature: 0.3
+    reason: "Code generation specialist"
+
+  frontend_dev:
+    model: qwen2.5-coder:7b
+    temperature: 0.3
+    reason: "Code generation specialist"
+
+  fullstack_dev:
+    model: qwen2.5-coder:7b
+    temperature: 0.3
+    reason: "Code generation specialist"
+
+  devops:
+    model: qwen2.5-coder:7b
+    temperature: 0.2
+    reason: "Config and scripts are code-like"
+
+  # General roles → llama3 (versatile)
+  pm:
+    model: llama3:latest
+    temperature: 0.5
+    reason: "General coordination and planning"
+
+  uxui_designer:
+    model: llama3:latest
+    temperature: 0.6
+    reason: "Creative and descriptive"
+
+  qa_tester:
+    model: llama3:latest
+    temperature: 0.3
+    reason: "Test case writing is general"
+
+# Best for:
+#   ✅ Full project lifecycle
+#   ✅ Mixed complexity projects
+#   ✅ Standard development workflow
+#   ✅ Most common use case

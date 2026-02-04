@@ -1,0 +1,99 @@
+# Python FastAPI Development Skill
+skill:
+  id: python-fastapi
+  name: "Python FastAPI Development"
+  version: "1.0"
+  description: "Modern Python API development with FastAPI"
+
+  available_to:
+    - backend_dev
+    - fullstack_dev
+
+  triggers:
+    - "python api"
+    - "fastapi"
+    - "python backend"
+    - "rest api python"
+
+  tech_versions:
+    python: "3.11+"
+    fastapi: "0.109+"
+    pydantic: "2.x"
+    sqlalchemy: "2.x"
+
+  includes:
+    patterns:
+      - "patterns/*.template"
+    docs:
+      - "best-practices.md"
+
+  dependencies:
+    required:
+      - "fastapi"
+      - "uvicorn[standard]"
+      - "pydantic"
+      - "python-dotenv"
+    recommended:
+      - "sqlalchemy[asyncio]"
+      - "alembic"
+      - "asyncpg"
+      - "redis"
+      - "httpx"
+      - "pytest"
+      - "pytest-asyncio"
+
+  coding_standards:
+    folder_structure: |
+      app/
+      ├── __init__.py
+      ├── main.py              # FastAPI app instance
+      ├── config.py            # Configuration
+      ├── dependencies.py      # Dependency injection
+      ├── api/
+      │   ├── __init__.py
+      │   ├── v1/
+      │   │   ├── __init__.py
+      │   │   ├── router.py    # API router
+      │   │   └── endpoints/
+      │   │       ├── __init__.py
+      │   │       ├── users.py
+      │   │       └── items.py
+      ├── core/
+      │   ├── __init__.py
+      │   ├── security.py      # Auth & security
+      │   └── exceptions.py    # Custom exceptions
+      ├── models/
+      │   ├── __init__.py
+      │   └── user.py          # SQLAlchemy models
+      ├── schemas/
+      │   ├── __init__.py
+      │   └── user.py          # Pydantic schemas
+      ├── services/
+      │   ├── __init__.py
+      │   └── user.py          # Business logic
+      ├── repositories/
+      │   ├── __init__.py
+      │   └── user.py          # Data access
+      └── db/
+          ├── __init__.py
+          ├── session.py       # Database session
+          └── base.py          # Base model
+
+    naming:
+      modules: "snake_case"
+      classes: "PascalCase"
+      functions: "snake_case"
+      constants: "SCREAMING_SNAKE_CASE"
+      private: "_leading_underscore"
+
+  instructions: |
+    ## FastAPI Development Guidelines
+
+    1. **Use Async/Await** - Default to async for I/O operations
+    2. **Pydantic V2** - Use model_validator, field_validator
+    3. **Dependency Injection** - Use FastAPI's DI system
+    4. **Repository Pattern** - Separate data access from business logic
+    5. **Type Hints** - Always use type annotations
+    6. **Error Handling** - Use HTTPException with proper status codes
+    7. **Validation** - Let Pydantic handle validation
+    8. **Documentation** - API docs auto-generated, add descriptions

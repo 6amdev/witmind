@@ -1,0 +1,8 @@
+{
+  "model": "qwen2.5-coder:7b",
+  "prompt": "Create deployment files for a static website using Docker + Nginx.\n\nCreate:\n1. Dockerfile - nginx serving static files from /usr/share/nginx/html\n2. docker-compose.yml - expose port 8080\n3. nginx.conf - basic config for SPA\n\nOutput each file with clear markers like:\n=== Dockerfile ===\n(content)\n\n=== docker-compose.yml ===\n(content)\n\nKeep it minimal and production-ready.",
+  "stream": false,
+  "options": {
+    "temperature": 0.2
+  }
+}

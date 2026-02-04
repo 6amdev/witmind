@@ -1,0 +1,422 @@
+# Smart Project Workflow
+# รวมทุก feature: Flexible Approval, Parallel, Retry, Skip
+
+workflow:
+  id: smart_project
+  name: "Smart Project Workflow"
+  team: dev
+  description: "Workflow อัจฉริยะที่รองรับทุก scenario"
+
+  trigger:
+    type: "manual"
+    command: "wit new --smart \"description\""
+
+  # ========================================
+  # Default Settings
+  # ========================================
+  defaults:
+    approval:
+      mode: "auto"                    # Default: auto-approve
+      confidence_threshold: 0.8       # ถ้า >= 80% → auto approve
+
+    error_handling:
+      max_retries: 3                  # ลองใหม่ 3 ครั้ง
+      retry_delay: 5                  # รอ 5 วินาที
+      escalate_after: 3               # หลัง 3 ครั้ง → escalate
+
+    parallel:
+      max_workers: 4                  # รัน 4 agents พร้อมกัน
+
+  # ========================================
+  # Trust Levels
+  # ========================================
+  trust_levels:
+    development:
+      auto_approve: true
+      skip_stages: ["spec", "design"]
+      require_stages: ["security"]
+
+    staging:
+      auto_approve: false
+      skip_stages: []
+      require_stages: ["testing", "security"]
+
+    production:
+      auto_approve: false
+      skip_stages: []
+      require_stages: ["ALL"]
+
+  # ========================================
+  # Stages
+  # ========================================
+  stages:
+
+    # ----------------------------------------
+    # Stage 1: Intake (PM)
+    # ----------------------------------------
+    - stage: "intake"
+      name: "รับงานและวิเคราะห์"
+      agent: pm
+
+      actions:
+        - read_request
+        - analyze_requirements
+        - create_spec
+
+      outputs:
+        - "docs/SPEC.md"
+        - "PROJECT.yaml"
+
+      approval:
+        mode: "auto"
+        auto_if:
+          - "spec_complete >= 0.9"
+          - "requirements_clear"
+
+        confidence:
+          threshold: 0.85
+          factors:
+            spec_complete: 0.4
+            requirements_clear: 0.3
+            client_info_present: 0.3
+
+      error_handling:
+        max_retries: 2
+        on_fail: "ask_user_clarification"
+
+      next: "design"
+
+    # ----------------------------------------
+    # Stage 2: Design (Tech Lead) - BLOCKING
+    # ----------------------------------------
+    - stage: "design"
+      name: "ออกแบบ Architecture"
+      agent: tech_lead
+
+      inputs:
+        - "docs/SPEC.md"
+
+      actions:
+        - design_architecture
+        - select_tech_stack
+        - create_tasks
+
+      outputs:
+        - "docs/ARCHITECTURE.md"
+        - "docs/TASKS.md"
+        - "docs/TECH_STACK.md"
+
+      approval:
+        mode: "blocking"            # ต้อง approve เสมอ
+        required: true
+        description: |
+          กรุณา review Architecture:
+          - Tech stack เหมาะสมหรือไม่
+          - รองรับ scale ได้หรือไม่
+
+        user_actions:
+          - action: "approve"
+            next: "development"
+          - action: "modify"
+            next: "design"
+            prompt: "ต้องการแก้ไขอะไร?"
+
+      next: "development"
+
+    # ----------------------------------------
+    # Stage 3: Development (PARALLEL + RETRY)
+    # ----------------------------------------
+    - stage: "development"
+      name: "พัฒนาระบบ"
+      parallel: true
+
+      tasks:
+        # Frontend - independent
+        - id: "frontend"
+          agent: frontend_dev
+          task_filter: "frontend/*"
+          depends_on: []              # ไม่รอใคร
+
+          error_handling:
+            max_retries: 5            # ลองใหม่ได้ 5 ครั้ง
+            retry_on:
+              - "test_failure"
+              - "build_error"
+              - "lint_error"
+            on_retry:
+              - "read_error_message"
+              - "identify_cause"
+              - "fix_code"
+              - "run_tests_again"
+
+        # Backend - independent
+        - id: "backend"
+          agent: backend_dev
+          task_filter: "backend/*"
+          depends_on: []
+
+          error_handling:
+            max_retries: 5
+            retry_on:
+              - "test_failure"
+              - "build_error"
+
+        # API Integration - waits for backend
+        - id: "api_integration"
+          agent: fullstack_dev
+          task_filter: "integration/*"
+          depends_on: ["backend"]     # รอ backend เสร็จ
+
+          error_handling:
+            max_retries: 3
+
+        # Frontend Integration - waits for frontend + api
+        - id: "frontend_integration"
+          agent: frontend_dev
+          task_filter: "integration/frontend/*"
+          depends_on: ["frontend", "api_integration"]
+
+      # Parallel approval mode
+      parallel_approval:
+        mode: "batch"               # รวม approve ทีเดียว
+
+      approval:
+        mode: "async"               # ทำต่อได้ ไม่ต้องรอ
+        post_review: true           # Review ภายหลัง
+
+      # Checkpoint - optional
+      checkpoint:
+        enabled: true
+        on: "each_task_complete"
+        message: "{{agent}} เสร็จ {{task}} แล้ว"
+        actions:
+          - "continue"              # ทำต่อ
+          - "review_now"            # Review ตอนนี้
+
+      next: "testing"
+      timeout_minutes: 180
+
+    # ----------------------------------------
+    # Stage 4: Testing (QA) - AUTO
+    # ----------------------------------------
+    - stage: "testing"
+      name: "ทดสอบระบบ"
+      agent: qa_tester
+
+      actions:
+        - run_unit_tests
+        - run_integration_tests
+        - run_e2e_tests
+        - generate_coverage_report
+
+      outputs:
+        - "tests/**"
+        - "docs/TEST_REPORT.md"
+        - "coverage/"
+
+      approval:
+        mode: "auto"                # Auto-approve ถ้า tests ผ่าน
+        auto_if:
+          - "all_tests_passed"
+          - "coverage >= 80"
+
+        confidence:
+          threshold: 0.9            # ต้องมั่นใจ 90%
+          factors:
+            all_tests_passed: 0.5
+            coverage_adequate: 0.3
+            no_critical_bugs: 0.2
+
+      error_handling:
+        max_retries: 3
+        retry_on:
+          - "flaky_test"
+        no_retry_on:
+          - "test_failure"          # ถ้า test fail จริง → ส่งกลับ dev
+        on_test_fail: "send_to_development"
+
+      next: "security"
+
+    # ----------------------------------------
+    # Stage 5: Security - BLOCKING (REQUIRED)
+    # ----------------------------------------
+    - stage: "security"
+      name: "ตรวจสอบความปลอดภัย"
+      agent: security_auditor
+
+      actions:
+        - dependency_audit
+        - code_security_scan
+        - vulnerability_check
+        - generate_security_report
+
+      outputs:
+        - "docs/SECURITY_REPORT.md"
+
+      approval:
+        mode: "blocking"
+        required: true
+        cannot_skip: true           # ห้าม skip เด็ดขาด
+
+        description: |
+          ⚠️ Security Audit ต้องได้รับการ approve
+          กรุณาตรวจสอบ:
+          - Critical vulnerabilities
+          - Dependency risks
+          - Code security issues
+
+        user_actions:
+          - action: "approve"
+            description: "Security OK"
+            next: "deploy_staging"
+
+          - action: "fix_required"
+            description: "ต้องแก้ไข security issues"
+            next: "development"
+            prompt: "Issues ที่ต้องแก้:"
+
+          - action: "accept_risk"
+            description: "รับทราบ risks และยอมรับ"
+            next: "deploy_staging"
+            prompt: "เหตุผลที่ยอมรับ risk:"
+            requires_confirmation: true
+
+      next: "deploy_staging"
+
+    # ----------------------------------------
+    # Stage 6: Deploy Staging - AUTO
+    # ----------------------------------------
+    - stage: "deploy_staging"
+      name: "Deploy to Staging"
+      agent: devops
+
+      actions:
+        - build_docker_image
+        - deploy_to_staging
+        - run_smoke_tests
+        - generate_staging_url
+
+      outputs:
+        - "Dockerfile"
+        - "docker-compose.yml"
+        - "docs/DEPLOY_INFO.md"
+
+      approval:
+        mode: "auto"                # Auto-approve ถ้า smoke tests ผ่าน
+        auto_if:
+          - "smoke_tests_passed"
+          - "staging_healthy"
+
+        confidence:
+          threshold: 0.9
+
+      error_handling:
+        max_retries: 2
+        retry_on:
+          - "deploy_failed"
+          - "container_crash"
+        on_fail: "rollback_and_escalate"
+
+      next: "deploy_production"
+
+    # ----------------------------------------
+    # Stage 7: Deploy Production - BLOCKING
+    # ----------------------------------------
+    - stage: "deploy_production"
+      name: "Deploy to Production"
+      agent: devops
+
+      approval:
+        mode: "blocking"
+        required: true
+        cannot_skip: true           # ห้าม skip
+
+        description: |
+          🚀 Production Deployment
+          - Staging URL: {{STAGING_URL}}
+          - กรุณาทดสอบบน staging ก่อน approve
+
+        present_to_user:
+          - "docs/DEPLOY_INFO.md"
+          - "docs/TEST_REPORT.md"
+          - "docs/SECURITY_REPORT.md"
+
+        user_actions:
+          - action: "deploy"
+            description: "✅ Deploy to Production"
+            next: "delivery"
+
+          - action: "staging_only"
+            description: "ใช้ Staging ก่อน"
+            next: "delivery"
+            set_flag: "skip_production"
+
+          - action: "rollback"
+            description: "พบปัญหา ต้องแก้ไข"
+            next: "development"
+            prompt: "ปัญหาที่พบ:"
+
+      actions:
+        - deploy_to_production
+        - run_production_healthcheck
+        - setup_monitoring
+
+      outputs:
+        - "docs/PRODUCTION_INFO.md"
+
+      next: "delivery"
+
+    # ----------------------------------------
+    # Stage 8: Delivery - POST_REVIEW
+    # ----------------------------------------
+    - stage: "delivery"
+      name: "ส่งมอบงาน"
+      agent: pm
+
+      actions:
+        - final_documentation
+        - create_handoff_notes
+        - notify_client
+
+      outputs:
+        - "docs/DELIVERY.md"
+        - "CHANGELOG.md"
+
+      approval:
+        mode: "post_review"         # ทำเลย review ทีหลัง
+        queue_for_review: true
+
+      on_complete: "move_to_completed"
+
+  # ========================================
+  # Error Escalation
+  # ========================================
+  escalation:
+    channels:
+      - type: "log"
+      - type: "notification"
+      - type: "slack"
+        webhook: "{{SLACK_WEBHOOK}}"
+
+    on_escalate:
+      - notify_human
+      - pause_workflow
+      - save_state
+
+  # ========================================
+  # Notifications
+  # ========================================
+  notifications:
+    on_stage_complete: false        # ไม่แจ้งทุก stage
+    on_approval_needed: true        # แจ้งเมื่อต้อง approve
+    on_error: true                  # แจ้งเมื่อ error
+    on_escalation: true             # แจ้งเมื่อ escalate
+    on_complete: true               # แจ้งเมื่อเสร็จ
+
+  # ========================================
+  # State Management
+  # ========================================
+  state:
+    save_checkpoints: true          # บันทึก checkpoint
+    allow_resume: true              # Resume ได้ถ้าหยุดไป
+    checkpoint_interval: "per_stage"

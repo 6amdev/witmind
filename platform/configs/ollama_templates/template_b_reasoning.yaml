@@ -1,0 +1,78 @@
+# Template B: Reasoning Focus
+# ใช้ deepseek-r1 เป็นหลัก เหมาะกับ project ที่ต้องคิดวิเคราะห์
+#
+# ┌─────────────────────────────────────────────────────────┐
+# │            TEMPLATE B: REASONING FOCUS                  │
+# ├─────────────────────────────────────────────────────────┤
+# │                                                         │
+# │   Agent              Model              Reason          │
+# │   ─────────────────────────────────────────────────     │
+# │   business_analyst   deepseek-r1:8b     ⭐ Deep analysis│
+# │   uxui_designer      deepseek-r1:8b     UX reasoning    │
+# │   tech_lead          deepseek-r1:8b     ⭐ Architecture │
+# │   pm                 deepseek-r1:8b     Planning        │
+# │   backend_dev        qwen2.5-coder:7b   Code generation │
+# │   frontend_dev       qwen2.5-coder:7b   Code generation │
+# │   fullstack_dev      qwen2.5-coder:7b   Code generation │
+# │   devops             deepseek-r1:8b     Infrastructure  │
+# │   qa_tester          deepseek-r1:8b     Test strategy   │
+# │   security_auditor   deepseek-r1:8b     ⭐ Security     │
+# │                                                         │
+# │   Primary Model: deepseek-r1:8b (7/10 agents)          │
+# └─────────────────────────────────────────────────────────┘
+
+preset_name: ollama_reasoning
+description: "Reasoning-focused configuration using deepseek-r1"
+
+defaults:
+  provider: ollama
+  host: http://192.168.80.203:11434
+  timeout: 600  # Longer timeout for reasoning
+
+agents:
+  business_analyst:
+    model: deepseek-r1:8b
+    temperature: 0.3
+
+  uxui_designer:
+    model: deepseek-r1:8b
+    temperature: 0.5
+
+  tech_lead:
+    model: deepseek-r1:8b
+    temperature: 0.3
+
+  pm:
+    model: deepseek-r1:8b
+    temperature: 0.4
+
+  backend_dev:
+    model: qwen2.5-coder:7b
+    temperature: 0.3
+
+  frontend_dev:
+    model: qwen2.5-coder:7b
+    temperature: 0.3
+
+  fullstack_dev:
+    model: qwen2.5-coder:7b
+    temperature: 0.3
+
+  devops:
+    model: deepseek-r1:8b
+    temperature: 0.2
+
+  qa_tester:
+    model: deepseek-r1:8b
+    temperature: 0.3
+
+  security_auditor:
+    model: deepseek-r1:8b
+    temperature: 0.2
+
+# Best for:
+#   ✅ Complex business applications
+#   ✅ Architecture design
+#   ✅ Security-critical projects
+#   ✅ Enterprise systems
+#   ❌ Simple CRUD apps (use Template A or D)

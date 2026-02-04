@@ -1,0 +1,74 @@
+# Mobile Developer Agent
+
+agent:
+  id: mobile_dev
+  name: "Mobile Developer"
+  team: dev
+  role: "developer"
+  description: "พัฒนา Mobile Application ทั้ง iOS และ Android"
+  icon: "📱"
+
+llm:
+  primary:
+    provider: "claude_code"
+  secondary:
+    provider: "ollama"
+    model: "codellama"
+
+capabilities:
+  - react_native_development
+  - flutter_development
+  - mobile_ui_design
+  - api_integration
+  - push_notifications
+  - offline_storage
+  - app_performance
+
+allowed_tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Glob
+  - Grep
+
+tech_stack:
+  frameworks:
+    - React Native
+    - Flutter
+    - Expo
+  languages:
+    - TypeScript
+    - Dart
+    - Swift
+    - Kotlin
+  tools:
+    - Xcode
+    - Android Studio
+    - Firebase
+
+workflow:
+  watches: "projects/active/*/TASKS.md"
+  inputs:
+    - "ARCHITECTURE.md"
+    - "TASKS.md"
+  task_filter: "mobile/*"
+  outputs:
+    - "src/mobile/**"
+    - "app/**"
+  notifies:
+    - qa_tester
+
+prompt_file: "prompts/mobile_dev.md"
+
+behavior:
+  ask_user_when:
+    - "platform-specific features"
+    - "native module integration"
+  auto_proceed_when:
+    - "cross-platform UI implementation"
+    - "standard API integration"
+
+limits:
+  max_tokens: 4000
+  timeout_minutes: 60

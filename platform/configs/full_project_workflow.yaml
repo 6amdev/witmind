@@ -1,0 +1,298 @@
+# Full Project Workflow - Enterprise Grade
+# Complete SDLC with BA, UX/UI, and full team collaboration
+# Better than smart_project: More thorough, better documentation, higher quality
+
+workflow:
+  id: full_project
+  name: "Full Project Workflow"
+  team: dev
+  version: "2.0.0"
+  description: |
+    Enterprise-grade workflow with Business Analysis and UX/UI Design.
+    Suitable for medium-large projects requiring complete documentation.
+
+  # ========================================
+  # STAGES (11 Total)
+  # ========================================
+  stages:
+
+    # ========================================
+    # PHASE 1: DISCOVERY
+    # ========================================
+
+    # Stage 1: Business Analysis
+    - stage: "business_analysis"
+      name: "Business Analysis"
+      agent: business_analyst
+      phase: "discovery"
+      description: "BA analyzes business requirements, creates BRD, User Stories"
+
+      outputs:
+        - "docs/BRD.md"
+        - "docs/USER_STORIES.md"
+        - "docs/USE_CASES.md"
+        - "docs/STAKEHOLDERS.md"
+
+      approval:
+        mode: "auto"
+        confidence:
+          threshold: 0.85
+
+      next: "requirements"
+
+    # Stage 2: Requirements (PM)
+    - stage: "requirements"
+      name: "Requirements & Planning"
+      agent: pm
+      phase: "discovery"
+      description: "PM consolidates requirements, creates SPEC.md"
+
+      outputs:
+        - "SPEC.md"
+        - "PROJECT.yaml"
+        - "docs/TIMELINE.md"
+
+      approval:
+        mode: "auto"
+
+      next: "ux_design"
+
+    # ========================================
+    # PHASE 2: DESIGN
+    # ========================================
+
+    # Stage 3: UX/UI Design
+    - stage: "ux_design"
+      name: "UX/UI Design"
+      agent: uxui_designer
+      phase: "design"
+      description: "UX/UI Designer creates Personas, Wireframes, Design System"
+
+      outputs:
+        - "docs/design/PERSONAS.md"
+        - "docs/design/USER_JOURNEY.md"
+        - "docs/design/WIREFRAMES.md"
+        - "docs/design/UI_SPECS.md"
+        - "docs/design/DESIGN_SYSTEM.md"
+        - "docs/design/COMPONENTS.md"
+
+      approval:
+        mode: "auto"
+        confidence:
+          threshold: 0.8
+
+      next: "architecture"
+
+    # Stage 4: Architecture Design
+    - stage: "architecture"
+      name: "Architecture Design"
+      agent: tech_lead
+      phase: "design"
+      description: "Tech Lead designs system architecture, creates TASKS.md"
+
+      outputs:
+        - "ARCHITECTURE.md"
+        - "TECH_STACK.md"
+        - "TASKS.md"
+        - "docs/API_SPEC.md"
+        - "docs/DATABASE_SCHEMA.md"
+
+      approval:
+        mode: "auto"
+
+      next: "development"
+
+    # ========================================
+    # PHASE 3: DEVELOPMENT (PARALLEL)
+    # ========================================
+
+    # Stage 5: Development
+    - stage: "development"
+      name: "Development"
+      phase: "development"
+      parallel: true
+      description: "Frontend and Backend develop in parallel"
+
+      tasks:
+        - id: "frontend"
+          agent: frontend_dev
+          depends_on: []
+          error_handling:
+            max_retries: 5
+
+        - id: "backend"
+          agent: backend_dev
+          depends_on: []
+          error_handling:
+            max_retries: 5
+
+        - id: "integration"
+          agent: fullstack_dev
+          depends_on: ["backend"]
+          error_handling:
+            max_retries: 3
+
+      approval:
+        mode: "async"
+
+      next: "code_review"
+
+    # ========================================
+    # PHASE 4: QUALITY ASSURANCE
+    # ========================================
+
+    # Stage 6: Code Review
+    - stage: "code_review"
+      name: "Code Review"
+      agent: tech_lead
+      phase: "qa"
+      description: "Tech Lead reviews code quality"
+
+      outputs:
+        - "docs/CODE_REVIEW.md"
+
+      approval:
+        mode: "auto"
+
+      next: "testing"
+
+    # Stage 7: Testing
+    - stage: "testing"
+      name: "Testing"
+      agent: qa_tester
+      phase: "qa"
+      description: "QA runs all tests and generates report"
+
+      outputs:
+        - "tests/**"
+        - "TEST_REPORT.md"
+        - "coverage/"
+
+      approval:
+        mode: "auto"
+        confidence:
+          threshold: 0.9
+
+      error_handling:
+        max_retries: 3
+        on_test_fail: "send_to_development"
+
+      next: "security"
+
+    # Stage 8: Security Audit
+    - stage: "security"
+      name: "Security Audit"
+      agent: security_auditor
+      phase: "qa"
+      description: "Security audit - OWASP, vulnerability scan"
+
+      outputs:
+        - "SECURITY_REPORT.md"
+
+      approval:
+        mode: "blocking"
+        required: true
+        cannot_skip: true
+
+      next: "deploy_staging"
+
+    # ========================================
+    # PHASE 5: DEPLOYMENT
+    # ========================================
+
+    # Stage 9: Deploy Staging
+    - stage: "deploy_staging"
+      name: "Deploy to Staging"
+      agent: devops
+      phase: "deployment"
+      description: "Deploy to staging, run smoke tests"
+
+      outputs:
+        - "Dockerfile"
+        - "docker-compose.yml"
+        - ".github/workflows/ci-cd.yml"
+        - "DEPLOY_INFO.md"
+
+      approval:
+        mode: "auto"
+
+      next: "deploy_production"
+
+    # Stage 10: Deploy Production
+    - stage: "deploy_production"
+      name: "Deploy to Production"
+      agent: devops
+      phase: "deployment"
+      description: "Deploy to production"
+
+      approval:
+        mode: "blocking"
+        required: true
+        cannot_skip: true
+
+      outputs:
+        - "docs/PRODUCTION_INFO.md"
+
+      next: "delivery"
+
+    # ========================================
+    # PHASE 6: DELIVERY
+    # ========================================
+
+    # Stage 11: Delivery
+    - stage: "delivery"
+      name: "Project Delivery"
+      agent: pm
+      phase: "delivery"
+      description: "PM finalizes documentation and delivers"
+
+      outputs:
+        - "DELIVERY.md"
+        - "CHANGELOG.md"
+        - "docs/USER_GUIDE.md"
+
+      approval:
+        mode: "post_review"
+
+      on_complete: "move_to_completed"
+
+  # ========================================
+  # WORKFLOW SUMMARY
+  # ========================================
+  summary:
+    total_stages: 11
+    total_agents: 7
+    phases:
+      discovery: ["business_analyst", "pm"]
+      design: ["uxui_designer", "tech_lead"]
+      development: ["frontend_dev", "backend_dev", "fullstack_dev"]
+      qa: ["tech_lead", "qa_tester", "security_auditor"]
+      deployment: ["devops"]
+      delivery: ["pm"]
+
+    key_documents:
+      - "docs/BRD.md"
+      - "docs/USER_STORIES.md"
+      - "docs/design/PERSONAS.md"
+      - "docs/design/WIREFRAMES.md"
+      - "docs/design/UI_SPECS.md"
+      - "docs/design/DESIGN_SYSTEM.md"
+      - "SPEC.md"
+      - "ARCHITECTURE.md"
+      - "TASKS.md"
+      - "TEST_REPORT.md"
+      - "SECURITY_REPORT.md"
+      - "DEPLOY_INFO.md"
+      - "DELIVERY.md"
+
+  # ========================================
+  # IMPROVEMENTS OVER smart_project
+  # ========================================
+  improvements:
+    - "Business Analysis stage - understand business before coding"
+    - "UX/UI Design stage - design user experience before development"
+    - "Code Review stage - quality check before testing"
+    - "More comprehensive documentation (BRD, Personas, Wireframes)"
+    - "7 agents instead of 5"
+    - "Phase-based workflow (6 phases)"
+    - "Better quality gates"

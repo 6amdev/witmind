@@ -1,0 +1,183 @@
+# Agent LLM Configuration - Ollama Only
+# All presets use only local Ollama models (FREE)
+#
+# Available Models:
+#   - llama3:latest     (8B)  - General purpose
+#   - deepseek-r1:8b    (8B)  - Reasoning/Analysis
+#   - qwen2.5-coder:7b  (7B)  - Code generation
+
+defaults:
+  provider: ollama
+  host: http://192.168.80.203:11434
+  temperature: 0.5
+  max_tokens: 4096
+  timeout: 300
+
+# ============================================================
+# PRESETS - Choose one with: wit run project --preset <name>
+# ============================================================
+
+presets:
+  # --------------------------------------------------------
+  # LOCAL_ONLY (Balanced) - Default for Ollama
+  # --------------------------------------------------------
+  local_only:
+    business_analyst:
+      provider: ollama
+      model: deepseek-r1:8b
+    uxui_designer:
+      provider: ollama
+      model: llama3:latest
+    tech_lead:
+      provider: ollama
+      model: deepseek-r1:8b
+    pm:
+      provider: ollama
+      model: llama3:latest
+    backend_dev:
+      provider: ollama
+      model: qwen2.5-coder:7b
+    frontend_dev:
+      provider: ollama
+      model: qwen2.5-coder:7b
+    fullstack_dev:
+      provider: ollama
+      model: qwen2.5-coder:7b
+    devops:
+      provider: ollama
+      model: qwen2.5-coder:7b
+    qa_tester:
+      provider: ollama
+      model: llama3:latest
+    security_auditor:
+      provider: ollama
+      model: deepseek-r1:8b
+
+  # --------------------------------------------------------
+  # OLLAMA_CODING - Code generation focus
+  # --------------------------------------------------------
+  ollama_coding:
+    business_analyst:
+      provider: ollama
+      model: qwen2.5-coder:7b
+    uxui_designer:
+      provider: ollama
+      model: qwen2.5-coder:7b
+    tech_lead:
+      provider: ollama
+      model: qwen2.5-coder:7b
+    pm:
+      provider: ollama
+      model: llama3:latest
+    backend_dev:
+      provider: ollama
+      model: qwen2.5-coder:7b
+    frontend_dev:
+      provider: ollama
+      model: qwen2.5-coder:7b
+    fullstack_dev:
+      provider: ollama
+      model: qwen2.5-coder:7b
+    devops:
+      provider: ollama
+      model: qwen2.5-coder:7b
+    qa_tester:
+      provider: ollama
+      model: qwen2.5-coder:7b
+    security_auditor:
+      provider: ollama
+      model: deepseek-r1:8b
+
+  # --------------------------------------------------------
+  # OLLAMA_REASONING - Deep analysis focus
+  # --------------------------------------------------------
+  ollama_reasoning:
+    business_analyst:
+      provider: ollama
+      model: deepseek-r1:8b
+    uxui_designer:
+      provider: ollama
+      model: deepseek-r1:8b
+    tech_lead:
+      provider: ollama
+      model: deepseek-r1:8b
+    pm:
+      provider: ollama
+      model: deepseek-r1:8b
+    backend_dev:
+      provider: ollama
+      model: qwen2.5-coder:7b
+    frontend_dev:
+      provider: ollama
+      model: qwen2.5-coder:7b
+    fullstack_dev:
+      provider: ollama
+      model: qwen2.5-coder:7b
+    devops:
+      provider: ollama
+      model: deepseek-r1:8b
+    qa_tester:
+      provider: ollama
+      model: deepseek-r1:8b
+    security_auditor:
+      provider: ollama
+      model: deepseek-r1:8b
+
+  # --------------------------------------------------------
+  # OLLAMA_SPEED - Single model for fastest execution
+  # --------------------------------------------------------
+  ollama_speed:
+    business_analyst:
+      provider: ollama
+      model: llama3:latest
+    uxui_designer:
+      provider: ollama
+      model: llama3:latest
+    tech_lead:
+      provider: ollama
+      model: llama3:latest
+    pm:
+      provider: ollama
+      model: llama3:latest
+    backend_dev:
+      provider: ollama
+      model: llama3:latest
+    frontend_dev:
+      provider: ollama
+      model: llama3:latest
+    fullstack_dev:
+      provider: ollama
+      model: llama3:latest
+    devops:
+      provider: ollama
+      model: llama3:latest
+    qa_tester:
+      provider: ollama
+      model: llama3:latest
+    security_auditor:
+      provider: ollama
+      model: llama3:latest
+
+# ============================================================
+# VISUAL SUMMARY
+# ============================================================
+#
+# ┌────────────────┬──────────────┬──────────────┬──────────────┬──────────────┐
+# │ Agent          │ local_only   │ ollama_coding│ollama_reason │ ollama_speed │
+# ├────────────────┼──────────────┼──────────────┼──────────────┼──────────────┤
+# │business_analyst│ deepseek-r1  │ qwen-coder   │ deepseek-r1  │ llama3       │
+# │uxui_designer   │ llama3       │ qwen-coder   │ deepseek-r1  │ llama3       │
+# │tech_lead       │ deepseek-r1  │ qwen-coder   │ deepseek-r1  │ llama3       │
+# │pm              │ llama3       │ llama3       │ deepseek-r1  │ llama3       │
+# │backend_dev     │ qwen-coder   │ qwen-coder   │ qwen-coder   │ llama3       │
+# │frontend_dev    │ qwen-coder   │ qwen-coder   │ qwen-coder   │ llama3       │
+# │fullstack_dev   │ qwen-coder   │ qwen-coder   │ qwen-coder   │ llama3       │
+# │devops          │ qwen-coder   │ qwen-coder   │ deepseek-r1  │ llama3       │
+# │qa_tester       │ llama3       │ qwen-coder   │ deepseek-r1  │ llama3       │
+# │security_auditor│ deepseek-r1  │ deepseek-r1  │ deepseek-r1  │ llama3       │
+# └────────────────┴──────────────┴──────────────┴──────────────┴──────────────┘
+#
+# Legend:
+#   deepseek-r1  = deepseek-r1:8b (Reasoning)
+#   qwen-coder   = qwen2.5-coder:7b (Coding)
+#   llama3       = llama3:latest (General)

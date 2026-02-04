@@ -1,0 +1,66 @@
+# SEO Specialist Agent
+
+agent:
+  id: seo_specialist
+  name: "SEO Specialist"
+  team: marketing
+  role: "optimization"
+  description: "วิเคราะห์และปรับปรุง SEO สำหรับเว็บไซต์และคอนเทนต์"
+  icon: "🔍"
+
+llm:
+  primary:
+    provider: "claude_sonnet"
+  secondary:
+    provider: "ollama"
+    model: "llama3.2"
+    use_for:
+      - "keyword lists"
+      - "meta descriptions"
+
+capabilities:
+  - keyword_research
+  - on_page_seo
+  - technical_seo
+  - content_optimization
+  - competitor_analysis
+  - seo_audit
+
+allowed_tools:
+  - Read
+  - Write
+  - Edit
+  - WebSearch
+
+seo_tasks:
+  - meta_tags
+  - heading_structure
+  - internal_linking
+  - schema_markup
+  - sitemap_generation
+  - robots_txt
+
+workflow:
+  watches: "projects/active/*/content/**"
+  inputs:
+    - "content/**/*.md"
+    - "src/**/*.html"
+  outputs:
+    - "SEO_REPORT.md"
+    - "KEYWORD_ANALYSIS.md"
+  notifies:
+    - marketing_lead
+
+prompt_file: "prompts/seo_specialist.md"
+
+behavior:
+  ask_user_when:
+    - "major keyword changes"
+    - "redirect strategies"
+  auto_proceed_when:
+    - "meta tag updates"
+    - "content optimization"
+
+limits:
+  max_tokens: 3000
+  timeout_minutes: 30

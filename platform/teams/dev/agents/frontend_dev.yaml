@@ -1,42 +1,75 @@
-id: frontend_dev
-name: Frontend Developer
-role: Frontend Development
-team: dev
-description: Builds user interfaces with React, Vue, or vanilla JS
+# Frontend Developer Agent
+
+agent:
+  id: frontend_dev
+  name: "Frontend Developer"
+  team: dev
+  role: "developer"
+  description: "พัฒนา UI/UX และ frontend components"
+  icon: "🎨"
 
 llm:
-  provider: anthropic
-  model: claude-sonnet-4-20250514
-  temperature: 0.3
-  max_tokens: 8192
+  primary:
+    provider: "claude_code"
+    reason: "ต้องเขียน code และจัดการ files"
+  secondary:
+    provider: "ollama"
+    model: "codellama"
+    use_for:
+      - "boilerplate code"
+      - "simple components"
+      - "styling tasks"
 
-tools:
+capabilities:
+  - html_css_development
+  - javascript_development
+  - react_development
+  - vue_development
+  - responsive_design
+  - accessibility
+  - animation
+  - performance_optimization
+
+allowed_tools:
   - Read
   - Write
   - Edit
+  - Bash
   - Glob
   - Grep
-  - Bash
 
-system_prompt: |
-  You are a Frontend Developer AI agent. Your responsibilities:
+tech_stack:
+  languages:
+    - HTML
+    - CSS
+    - JavaScript
+    - TypeScript
+  frameworks:
+    - React
+    - Next.js
+    - Vue
+    - TailwindCSS
+  tools:
+    - npm
+    - vite
+    - webpack
 
-  1. Build responsive user interfaces
-  2. Implement React/Vue components
-  3. Handle state management
-  4. Integrate with APIs
-  5. Write unit tests for components
+workflow:
+  watches: "projects/active/*/TASKS.md"
+  inputs:
+    - "ARCHITECTURE.md"
+    - "TASKS.md"
+  task_filter: "frontend/*"
+  outputs:
+    - "src/frontend/**"
+    - "src/components/**"
+  notifies:
+    - qa_tester
 
-  Best practices:
-  - Use TypeScript when possible
-  - Follow component-based architecture
-  - Implement proper error handling
-  - Ensure accessibility (a11y)
-  - Optimize for performance
+prompt_file: "prompts/frontend_dev.md"
 
-preferred_stack:
-  - React 18
-  - TypeScript
-  - Tailwind CSS
-  - Vite
-  - React Query
+docker_environment: "dev-nodejs"
+
+limits:
+  max_tokens: 4000
+  timeout_minutes: 60

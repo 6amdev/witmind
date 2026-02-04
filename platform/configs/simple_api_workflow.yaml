@@ -1,0 +1,100 @@
+# Simple API Workflow
+# Optimized for local LLMs (Ollama)
+# Fewer stages, focused tasks
+
+workflow:
+  id: simple_api
+  name: "Simple API Workflow"
+  description: "Lightweight workflow for simple API projects with local LLMs"
+
+  # Less complex than full_project
+  # 4 stages instead of 11
+
+stages:
+  # Stage 1: Design (Tech Lead designs the API)
+  - stage: design
+    name: "API Design"
+    description: "Design API endpoints and data structures"
+    agent: tech_lead
+    llm:
+      model: deepseek-r1:8b
+      reason: "Architecture reasoning"
+    task: |
+      Design a simple REST API based on the requirements.
+      Create:
+      1. SPEC.md - API specification with endpoints
+      2. ARCHITECTURE.md - Simple architecture overview
+      Keep it minimal and focused.
+    outputs:
+      - SPEC.md
+      - ARCHITECTURE.md
+    approval: auto
+
+  # Stage 2: Development (Backend Dev implements)
+  - stage: development
+    name: "Implementation"
+    description: "Implement the API"
+    agent: backend_dev
+    llm:
+      model: qwen2.5-coder:7b
+      reason: "Code generation"
+    task: |
+      Implement the API based on SPEC.md.
+      Create:
+      1. package.json with express dependency
+      2. src/index.js - Main API file
+      3. Run: npm install
+      Keep code simple and clean.
+    outputs:
+      - package.json
+      - src/index.js
+    tools:
+      - Read
+      - Write
+      - Edit
+      - Bash
+    approval: auto
+
+  # Stage 3: Testing (QA verifies it works)
+  - stage: testing
+    name: "Testing"
+    description: "Test the API"
+    agent: qa_tester
+    llm:
+      model: llama3:latest
+      reason: "Test generation"
+    task: |
+      Test the API:
+      1. Start the server
+      2. Test each endpoint with curl
+      3. Create TEST_REPORT.md with results
+    outputs:
+      - TEST_REPORT.md
+    tools:
+      - Read
+      - Write
+      - Bash
+    approval: auto
+
+  # Stage 4: Documentation (PM creates final docs)
+  - stage: documentation
+    name: "Documentation"
+    description: "Create user documentation"
+    agent: pm
+    llm:
+      model: llama3:latest
+      reason: "Documentation"
+    task: |
+      Create README.md with:
+      1. Project description
+      2. How to run
+      3. API endpoints documentation
+      4. Examples
+    outputs:
+      - README.md
+    approval: auto
+
+# Summary:
+# 4 stages (vs 11 in full_project)
+# All using Ollama models
+# Simpler tasks suited for local LLMs

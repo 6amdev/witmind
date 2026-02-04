@@ -1,0 +1,138 @@
+# New Project Workflow
+
+workflow:
+  id: new_project
+  name: "New Project Development"
+  team: dev
+  description: "สร้างโปรเจกต์ใหม่ตั้งแต่ต้นจนจบ"
+
+  trigger:
+    type: "new_file"
+    path: "projects/inbox/*.yaml"
+
+  stages:
+
+    - stage: "intake"
+      name: "รับงานและวิเคราะห์"
+      agent: pm
+      actions:
+        - read_request
+        - analyze_requirements
+        - create_spec
+      outputs:
+        - "SPEC.md"
+        - "PROJECT.yaml"
+      next: "design"
+      on_error: "ask_user"
+      timeout_minutes: 30
+
+    - stage: "design"
+      name: "ออกแบบ Architecture"
+      agent: tech_lead
+      inputs:
+        - "SPEC.md"
+      actions:
+        - design_architecture
+        - select_tech_stack
+        - create_tasks
+      outputs:
+        - "ARCHITECTURE.md"
+        - "TASKS.md"
+        - "TECH_STACK.md"
+      next: "development"
+      timeout_minutes: 45
+
+    - stage: "development"
+      name: "พัฒนาระบบ"
+      parallel: true
+      tasks:
+        - agent: frontend_dev
+          condition: "has_frontend"
+          task_filter: "frontend/*"
+        - agent: backend_dev
+          condition: "has_backend"
+          task_filter: "backend/*"
+        - agent: fullstack_dev
+          condition: "is_fullstack"
+          task_filter: "fullstack/*"
+        - agent: mobile_dev
+          condition: "has_mobile"
+          task_filter: "mobile/*"
+      next: "testing"
+      timeout_minutes: 120
+
+    - stage: "testing"
+      name: "ทดสอบระบบ"
+      agent: qa_tester
+      inputs:
+        - "src/**"
+        - "SPEC.md"
+      actions:
+        - run_unit_tests
+        - run_integration_tests
+        - run_e2e_tests
+        - generate_report
+      outputs:
+        - "tests/**"
+        - "TEST_REPORT.md"
+      next:
+        pass: "security"
+        fail: "development"
+      timeout_minutes: 45
+
+    - stage: "security"
+      name: "ตรวจสอบความปลอดภัย"
+      agent: security_auditor
+      condition: "project.security_required != false"
+      inputs:
+        - "src/**"
+        - "package.json"
+      actions:
+        - code_review
+        - dependency_audit
+        - vulnerability_scan
+      outputs:
+        - "SECURITY_REPORT.md"
+      next:
+        pass: "deployment"
+        fail: "development"
+      timeout_minutes: 30
+
+    - stage: "deployment"
+      name: "Deploy ระบบ"
+      agent: devops
+      inputs:
+        - "src/**"
+        - "ARCHITECTURE.md"
+      actions:
+        - create_dockerfile
+        - build_image
+        - deploy_staging
+        - run_smoke_tests
+      outputs:
+        - "Dockerfile"
+        - "docker-compose.yml"
+        - "DEPLOY_INFO.md"
+      next: "delivery"
+      timeout_minutes: 30
+
+    - stage: "delivery"
+      name: "ส่งมอบงาน"
+      agent: pm
+      inputs:
+        - "TEST_REPORT.md"
+        - "DEPLOY_INFO.md"
+      actions:
+        - final_review
+        - create_delivery_report
+        - notify_client
+      outputs:
+        - "DELIVERY.md"
+      on_complete: "move_to_completed"
+
+  notifications:
+    on_stage_complete: false
+    on_error: true
+    on_complete: true
+    channels:
+      - log

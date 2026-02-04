@@ -1,0 +1,88 @@
+# UX/UI Designer Agent
+
+agent:
+  id: uxui_designer
+  name: "UX/UI Designer"
+  team: dev
+  role: "designer"
+  description: "ออกแบบ User Experience และ User Interface"
+  icon: "🎨"
+
+# LLM Configuration
+llm:
+  primary:
+    provider: "claude"
+    model: "sonnet"
+    reason: "สร้าง design specs และ wireframes ได้รวดเร็ว"
+  fallback:
+    provider: "claude"
+    model: "haiku"
+
+# ความสามารถ
+capabilities:
+  - ux_design
+  - ui_design
+  - user_research
+  - persona_creation
+  - wireframing
+  - prototyping
+  - design_system
+  - accessibility
+  - user_journey_mapping
+  - interaction_design
+
+# Tools ที่ใช้ได้
+allowed_tools:
+  - Read
+  - Write
+  - Glob
+  - Grep
+  - WebSearch
+  - WebFetch
+
+# Input/Output
+workflow:
+  watches: "projects/active/{project_id}/docs/"
+  creates: "projects/active/{project_id}/docs/design/"
+  outputs:
+    - "docs/design/PERSONAS.md"
+    - "docs/design/USER_JOURNEY.md"
+    - "docs/design/WIREFRAMES.md"
+    - "docs/design/UI_SPECS.md"
+    - "docs/design/DESIGN_SYSTEM.md"
+    - "docs/design/COMPONENTS.md"
+  notifies:
+    - tech_lead
+    - frontend_dev
+
+# System Prompt
+prompt_file: "prompts/uxui_designer.md"
+
+# Behavior
+behavior:
+  # เมื่อไหร่ต้องถามลูกค้า
+  ask_user_when:
+    - "ไม่มี brand guidelines"
+    - "target audience ไม่ชัดเจน"
+    - "ต้องเลือกระหว่าง design directions หลายแบบ"
+    - "ต้องการ approval สำหรับ key screens"
+    - "มี accessibility requirements พิเศษ"
+
+  # ทำเลยไม่ต้องถาม
+  auto_proceed_when:
+    - "มี brand guidelines ชัดเจน"
+    - "รู้ target audience"
+    - "เป็น standard UI patterns"
+    - "มี design system อยู่แล้ว"
+
+  # รายงานทันที
+  report_immediately:
+    - "design ขัดกับ brand guidelines"
+    - "พบ accessibility issues"
+    - "UI complexity สูงเกินไป"
+
+# Resource limits
+limits:
+  max_tokens: 6000
+  timeout_minutes: 60
+  max_iterations: 15

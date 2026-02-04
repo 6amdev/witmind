@@ -1,0 +1,100 @@
+# Creative Project Workflow
+
+workflow:
+  id: creative_project
+  name: "Creative Design Project"
+  team: creative
+  description: "สร้างงานออกแบบและมีเดียครบวงจร"
+
+  trigger:
+    type: "new_file"
+    path: "projects/inbox/*creative*.yaml"
+
+  stages:
+
+    - stage: "brief"
+      name: "สร้าง Creative Brief"
+      agent: creative_director
+      actions:
+        - analyze_requirements
+        - define_visual_direction
+        - create_brief
+      outputs:
+        - "CREATIVE_BRIEF.md"
+        - "VISUAL_DIRECTION.md"
+      next: "design"
+      timeout_minutes: 30
+
+    - stage: "design"
+      name: "ออกแบบ"
+      parallel: true
+      tasks:
+        - agent: graphic_designer
+          condition: "has_graphics"
+          task: "create_graphics"
+        - agent: ui_designer
+          condition: "has_ui"
+          task: "create_ui_designs"
+      outputs:
+        - "designs/**"
+        - "ui/**"
+      next: "motion"
+      timeout_minutes: 60
+
+    - stage: "motion"
+      name: "สร้างแอนิเมชัน"
+      agent: motion_designer
+      condition: "project.has_animation != false"
+      inputs:
+        - "designs/**"
+        - "CREATIVE_BRIEF.md"
+      actions:
+        - create_animations
+        - create_transitions
+      outputs:
+        - "animations/**"
+        - "ANIMATION_SPEC.md"
+      next: "video"
+      timeout_minutes: 60
+
+    - stage: "video"
+      name: "ตัดต่อวิดีโอ"
+      agent: video_editor
+      condition: "project.has_video != false"
+      inputs:
+        - "animations/**"
+        - "designs/**"
+        - "CREATIVE_BRIEF.md"
+      actions:
+        - create_video_script
+        - edit_video
+        - add_effects
+      outputs:
+        - "videos/**"
+        - "VIDEO_SCRIPT.md"
+      next: "review"
+      timeout_minutes: 90
+
+    - stage: "review"
+      name: "ตรวจสอบและส่งมอบ"
+      agent: creative_director
+      inputs:
+        - "designs/**"
+        - "animations/**"
+        - "videos/**"
+      actions:
+        - quality_review
+        - prepare_assets
+        - create_delivery
+      outputs:
+        - "DELIVERY.md"
+        - "final_assets/**"
+      on_complete: "move_to_completed"
+      timeout_minutes: 30
+
+  notifications:
+    on_stage_complete: false
+    on_error: true
+    on_complete: true
+    channels:
+      - log

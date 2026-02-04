@@ -1,0 +1,99 @@
+# WitMind.AI Shared Docker Services
+# These services are shared across all teams and projects
+
+version: '3.8'
+
+services:
+  # MySQL Database (Shared)
+  mysql:
+    image: mysql:8.0
+    container_name: witmind_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-witmind_root_2024}
+      MYSQL_DATABASE: witmind
+      MYSQL_USER: witmind
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-witmind_2024}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    ports:
+      - "3307:3306"
+    networks:
+      - witmind_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis (Task Queue & Cache)
+  redis:
+    image: redis:7-alpine
+    container_name: witmind_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6380:6379"
+    networks:
+      - witmind_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: witmind_nginx
+    restart: unless-stopped
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - /home/wit/6amdev/projects:/var/www/projects:ro
+    ports:
+      - "8080:80"
+      - "8443:443"
+    networks:
+      - witmind_network
+    depends_on:
+      - mysql
+      - redis
+
+  # MinIO Object Storage (for large files)
+  minio:
+    image: minio/minio:latest
+    container_name: witmind_minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-witmind}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-witmind_2024}
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    networks:
+      - witmind_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+networks:
+  witmind_network:
+    driver: bridge
+    name: witmind_network
+
+volumes:
+  mysql_data:
+    name: witmind_mysql_data
+  redis_data:
+    name: witmind_redis_data
+  minio_data:
+    name: witmind_minio_data
