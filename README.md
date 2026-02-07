@@ -107,15 +107,17 @@ witmind/
 ### Development Team (11 agents)
 | Agent | Role | LLM |
 |-------|------|-----|
-| pm_agent | Project Manager | Claude Opus |
-| tech_lead | Architect | Claude Opus |
-| frontend_dev | Frontend | Claude Sonnet |
-| backend_dev | Backend | Claude Sonnet |
-| fullstack_dev | Fullstack | Claude Sonnet |
-| mobile_dev | Mobile | Claude Sonnet |
-| qa_engineer | QA/Testing | Claude Sonnet |
-| security_analyst | Security | Claude Opus |
-| devops_engineer | DevOps | Claude Sonnet |
+| pm | Project Manager | Claude Opus |
+| business_analyst | Business Analyst | Claude Opus |
+| tech_lead | Tech Lead/Architect | Claude Opus |
+| uxui_designer | UX/UI Designer | Claude Sonnet |
+| frontend_dev | Frontend Developer | Claude Sonnet |
+| backend_dev | Backend Developer | Claude Sonnet |
+| fullstack_dev | Fullstack Developer | Claude Sonnet |
+| mobile_dev | Mobile Developer | Claude Sonnet |
+| qa_tester | QA/Testing | Claude Sonnet |
+| security_auditor | Security Auditor | Claude Opus |
+| devops | DevOps Engineer | Claude Sonnet |
 
 ### Marketing Team (5 agents)
 | Agent | Role |
