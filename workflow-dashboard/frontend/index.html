@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Witmind Workflow Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .template-card {
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .template-card:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .template-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        }
+
+        .template-card h3 {
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .template-card p {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .agents-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .agent-badge {
+            background: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            color: #555;
+        }
+
+        .execution-log {
+            height: 500px;
+            overflow-y: auto;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 5px;
+            border-left: 3px solid transparent;
+        }
+
+        .log-entry.info {
+            border-left-color: #4fc3f7;
+        }
+
+        .log-entry.success {
+            border-left-color: #4caf50;
+        }
+
+        .log-entry.error {
+            border-left-color: #f44336;
+        }
+
+        .log-entry.agent {
+            border-left-color: #ffeb3b;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status.idle {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .status.running {
+            background: #4caf50;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .status.error {
+            background: #f44336;
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .ws-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 0.9em;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .ws-status.connected {
+            color: #4caf50;
+        }
+
+        .ws-status.disconnected {
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="ws-status" id="wsStatus">● Connecting...</div>
+
+    <div class="container">
+        <header>
+            <h1>🤖 Witmind Workflow Dashboard</h1>
+            <p class="subtitle">Autonomous AI Agent Workflows - Just describe what you want!</p>
+        </header>
+
+        <div class="grid">
+            <!-- Left: Create Workflow -->
+            <div class="card">
+                <h2>📝 Create Workflow</h2>
+
+                <div class="form-group">
+                    <label>Project Name</label>
+                    <input type="text" id="projectName" placeholder="my_awesome_project">
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="projectDescription" placeholder="Build a portfolio website with dark theme..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Workflow Template</label>
+                    <select id="templateSelect">
+                        <option value="">🤖 Auto-detect (Smart)</option>
+                    </select>
+                </div>
+
+                <div id="templatesGrid" class="template-grid"></div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="autoApprove" checked>
+                        Auto-approve all stages
+                    </label>
+                </div>
+
+                <button onclick="startWorkflow()">🚀 Start Workflow</button>
+            </div>
+
+            <!-- Right: Execution Log -->
+            <div class="card">
+                <h2>📊 Execution Log <span class="status idle" id="status">Idle</span></h2>
+                <div class="execution-log" id="executionLog">
+                    <div class="log-entry info">Waiting for workflow...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let selectedTemplate = null;
+
+        // WebSocket connection
+        function connectWebSocket() {
+            const wsUrl = `ws://${window.location.hostname}:5000/ws`;
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                updateWSStatus(true);
+                addLog('WebSocket connected', 'success');
+            };
+
+            ws.onclose = () => {
+                updateWSStatus(false);
+                addLog('WebSocket disconnected', 'error');
+                setTimeout(connectWebSocket, 3000);
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            };
+        }
+
+        function updateWSStatus(connected) {
+            const el = document.getElementById('wsStatus');
+            if (connected) {
+                el.textContent = '● Connected';
+                el.className = 'ws-status connected';
+            } else {
+                el.textContent = '● Disconnected';
+                el.className = 'ws-status disconnected';
+            }
+        }
+
+        function handleWebSocketMessage(data) {
+            switch (data.type) {
+                case 'workflow_start':
+                    updateStatus('running');
+                    addLog(`Starting workflow: ${data.project}`, 'info');
+                    addLog(`Description: ${data.description}`, 'info');
+                    break;
+
+                case 'workflow_complete':
+                    updateStatus('idle');
+                    addLog(`Workflow completed!`, 'success');
+                    addLog(`Result: ${JSON.stringify(data.result, null, 2)}`, 'success');
+                    break;
+
+                case 'workflow_error':
+                    updateStatus('error');
+                    addLog(`Error: ${data.error}`, 'error');
+                    break;
+
+                case 'agent_start':
+                    addLog(`Agent ${data.agent_id} started`, 'agent');
+                    break;
+
+                case 'agent_complete':
+                    addLog(`Agent ${data.agent_id} completed`, 'agent');
+                    break;
+            }
+        }
+
+        function updateStatus(status) {
+            const el = document.getElementById('status');
+            el.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+            el.className = `status ${status}`;
+        }
+
+        function addLog(message, type = 'info') {
+            const log = document.getElementById('executionLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${timestamp}] ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Load templates
+        async function loadTemplates() {
+            try {
+                const response = await fetch('http://localhost:5000/api/templates');
+                const templates = await response.json();
+
+                const select = document.getElementById('templateSelect');
+                const grid = document.getElementById('templatesGrid');
+
+                templates.forEach(template => {
+                    // Add to dropdown
+                    const option = document.createElement('option');
+                    option.value = template.id;
+                    option.textContent = `${template.name}`;
+                    select.appendChild(option);
+
+                    // Add to grid
+                    const card = document.createElement('div');
+                    card.className = 'template-card';
+                    card.onclick = () => selectTemplate(template.id);
+                    card.innerHTML = `
+                        <h3>${template.name}</h3>
+                        <p>${template.description}</p>
+                        <div class="agents-list">
+                            ${template.agents.map(a => `<span class="agent-badge">${a}</span>`).join('')}
+                        </div>
+                    `;
+                    card.dataset.templateId = template.id;
+                    grid.appendChild(card);
+                });
+
+                addLog(`Loaded ${templates.length} templates`, 'success');
+            } catch (error) {
+                addLog(`Failed to load templates: ${error}`, 'error');
+            }
+        }
+
+        function selectTemplate(templateId) {
+            selectedTemplate = templateId;
+            document.getElementById('templateSelect').value = templateId;
+
+            // Update visual selection
+            document.querySelectorAll('.template-card').forEach(card => {
+                if (card.dataset.templateId === templateId) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+        }
+
+        // Start workflow
+        async function startWorkflow() {
+            const projectName = document.getElementById('projectName').value.trim();
+            const description = document.getElementById('projectDescription').value.trim();
+            const templateId = document.getElementById('templateSelect').value;
+            const autoApprove = document.getElementById('autoApprove').checked;
+
+            if (!projectName || !description) {
+                alert('Please fill in project name and description');
+                return;
+            }
+
+            try {
+                updateStatus('running');
+                addLog('Sending workflow request...', 'info');
+
+                const response = await fetch('http://localhost:5000/api/projects/execute', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: projectName,
+                        description: description,
+                        template_id: templateId || null,
+                        auto_approve: autoApprove
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    addLog('Workflow started successfully!', 'success');
+                } else {
+                    addLog(`Error: ${result.error}`, 'error');
+                    updateStatus('error');
+                }
+            } catch (error) {
+                addLog(`Failed to start workflow: ${error}`, 'error');
+                updateStatus('error');
+            }
+        }
+
+        // Initialize
+        window.onload = () => {
+            connectWebSocket();
+            loadTemplates();
+        };
+    </script>
+</body>
+</html>
