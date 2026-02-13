@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft, Settings, Share2, Play, PanelRightClose, PanelRightOpen, Activity, ShieldCheck, Users } from 'lucide-react'
+import { ArrowLeft, Settings, Share2, Play, PanelRightClose, PanelRightOpen, Activity, ShieldCheck, Users, CheckCircle2, Terminal, ChevronDown, ChevronUp, GitBranch } from 'lucide-react'
 import { projectsApi, tasksApi, approvalsApi } from '../services/api'
 import { useProjectStore } from '../stores/projectStore'
 import { useSocket } from '../hooks/useSocket'
@@ -9,6 +9,7 @@ import KanbanBoard from '../components/Mission/KanbanBoard'
 import ActivityFeed from '../components/Mission/ActivityFeed'
 import ApprovalPanel from '../components/Mission/ApprovalPanel'
 import AgentStatusPanel from '../components/Mission/AgentStatusPanel'
+import AgentOutputPanel from '../components/Mission/AgentOutputPanel'
 import clsx from 'clsx'
 
 const statusLabels = {
@@ -31,9 +32,17 @@ type PanelTab = 'activity' | 'approvals' | 'agents'
 export default function MissionBoardPage() {
   const { projectId } = useParams<{ projectId: string }>()
   const queryClient = useQueryClient()
-  const { setCurrentProject, setTasks } = useProjectStore()
+  const { setCurrentProject, setTasks, activeAgent } = useProjectStore()
   const [showActivityPanel, setShowActivityPanel] = useState(true)
   const [activeTab, setActiveTab] = useState<PanelTab>('activity')
+  const [showOutputPanel, setShowOutputPanel] = useState(true)
+
+  // Auto-show output panel when agent starts working
+  useEffect(() => {
+    if (activeAgent) {
+      setShowOutputPanel(true)
+    }
+  }, [activeAgent])
 
   // Connect to socket for real-time updates
   useSocket(projectId)
@@ -133,6 +142,20 @@ export default function MissionBoardPage() {
               </span>
               <span>•</span>
               <span>{project.progress}%</span>
+              {project.git_repo_url && (
+                <>
+                  <span>•</span>
+                  <a
+                    href={project.git_repo_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-accent-blue hover:text-accent-blue/80 transition-colors"
+                  >
+                    <GitBranch className="w-3 h-3" />
+                    Git Repo
+                  </a>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -147,6 +170,15 @@ export default function MissionBoardPage() {
               <Play className="w-4 h-4" />
               {startMutation.isPending ? 'Starting...' : 'Start Project'}
             </button>
+          )}
+          {project.status === 'completed' && (
+            <Link
+              to={`/projects/${projectId}/complete`}
+              className="btn-primary flex items-center gap-2 bg-accent-green hover:bg-accent-green/80"
+            >
+              <CheckCircle2 className="w-4 h-4" />
+              View Results
+            </Link>
           )}
           <button className="btn-ghost p-2">
             <Share2 className="w-5 h-5" />
@@ -172,14 +204,15 @@ export default function MissionBoardPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden gap-4">
-        {/* Kanban Board */}
-        <div className={clsx(
-          'flex-1 overflow-hidden transition-all duration-300',
-          showActivityPanel ? 'pr-0' : ''
-        )}>
-          <KanbanBoard projectId={projectId!} tasks={tasks} isLoading={tasksLoading} projectStatus={project?.status} />
-        </div>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex overflow-hidden gap-4">
+          {/* Kanban Board */}
+          <div className={clsx(
+            'flex-1 overflow-hidden transition-all duration-300',
+            showActivityPanel ? 'pr-0' : ''
+          )}>
+            <KanbanBoard projectId={projectId!} tasks={tasks} isLoading={tasksLoading} projectStatus={project?.status} />
+          </div>
 
         {/* Side Panel */}
         <div className={clsx(
@@ -248,6 +281,31 @@ export default function MissionBoardPage() {
             </>
           )}
         </div>
+        </div>
+
+        {/* Agent Output Panel - slides up from bottom when agent is working */}
+        {activeAgent && (
+          <div className={clsx(
+            'transition-all duration-300 ease-in-out overflow-hidden',
+            showOutputPanel ? 'max-h-72 opacity-100 mt-4' : 'max-h-0 opacity-0'
+          )}>
+            <div className="relative">
+              {/* Toggle button */}
+              <button
+                onClick={() => setShowOutputPanel(!showOutputPanel)}
+                className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-bg-secondary border border-border-default rounded-t-lg px-4 py-1 text-xs text-text-muted hover:text-text-primary flex items-center gap-1 z-10"
+              >
+                <Terminal className="w-3 h-3" />
+                Agent Output
+                {showOutputPanel ? <ChevronDown className="w-3 h-3" /> : <ChevronUp className="w-3 h-3" />}
+              </button>
+              <AgentOutputPanel
+                onClose={() => setShowOutputPanel(false)}
+                className="w-full"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

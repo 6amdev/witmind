@@ -8,6 +8,7 @@ from .project import (
     ProjectResponse,
     ProjectStatus,
     ProjectType,
+    ExecutionMode,
 )
 from .task import (
     Task,
@@ -58,6 +59,7 @@ __all__ = [
     "ProjectResponse",
     "ProjectStatus",
     "ProjectType",
+    "ExecutionMode",
     "Task",
     "TaskCreate",
     "TaskUpdate",

@@ -18,6 +18,45 @@ const api = axios.create({
   },
 })
 
+// Add auth token to requests
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('auth_token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
+// Handle 401 responses
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('auth_token')
+      // Redirect to login if not already there
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login'
+      }
+    }
+    return Promise.reject(error)
+  }
+)
+
+// Project file info
+export interface ProjectFile {
+  path: string
+  name: string
+  size: number
+  extension: string
+}
+
+export interface ProjectFilesResponse {
+  files: ProjectFile[]
+  total_size: number
+  file_count: number
+  output_dir: string
+}
+
 // Projects
 export const projectsApi = {
   list: () => api.get<Project[]>('/projects').then((r) => r.data),
@@ -29,6 +68,14 @@ export const projectsApi = {
   delete: (id: string) => api.delete(`/projects/${id}`),
   start: (id: string) =>
     api.post<Project>(`/projects/${id}/start`).then((r) => r.data),
+  complete: (id: string, outputDir?: string, previewUrl?: string) =>
+    api.post<Project>(`/projects/${id}/complete`, {
+      output_dir: outputDir,
+      preview_url: previewUrl,
+    }).then((r) => r.data),
+  getFiles: (id: string) =>
+    api.get<ProjectFilesResponse>(`/projects/${id}/files`).then((r) => r.data),
+  getDownloadUrl: (id: string) => `/api/projects/${id}/download`,
 }
 
 // Tasks
@@ -103,6 +150,50 @@ export const commandsApi = {
     api.get(`/agents/${agentId}/commands`, {
       params: { pending_only: pendingOnly }
     }).then((r) => r.data),
+}
+
+// Platform API for running tasks with AI agents
+const platformApi = axios.create({
+  baseURL: import.meta.env.VITE_PLATFORM_API_URL || 'http://192.168.80.203:4005',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+export const platformAgentsApi = {
+  // Run a single task with an agent
+  runTask: (taskId: string, agentId?: string) =>
+    platformApi.post('/run-task', { task_id: taskId, agent_id: agentId }).then((r) => r.data),
+
+  // Run multiple tasks
+  runTasks: (taskIds: string[], agentId?: string) =>
+    platformApi.post('/run-tasks', { task_ids: taskIds, agent_id: agentId }).then((r) => r.data),
+
+  // Get queue status
+  getQueueStatus: () =>
+    platformApi.get('/queue-status').then((r) => r.data),
+
+  // Health check
+  health: () =>
+    platformApi.get('/health').then((r) => r.data),
+}
+
+// Auth
+export interface LoginResponse {
+  token: string
+  expires_at: string
+}
+
+export interface VerifyResponse {
+  valid: boolean
+  expires_at?: string
+}
+
+export const authApi = {
+  login: (password: string) =>
+    api.post<LoginResponse>('/auth/login', { password }).then((r) => r.data),
+  verify: () =>
+    api.get<VerifyResponse>('/auth/verify').then((r) => r.data),
 }
 
 export default api

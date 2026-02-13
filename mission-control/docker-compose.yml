@@ -1,0 +1,95 @@
+# =============================================================================
+# Mission Control v2 - Docker Compose
+# =============================================================================
+# Usage: docker compose up -d --build
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Backend API
+  # ---------------------------------------------------------------------------
+  backend:
+    build: ./backend
+    container_name: mc2-backend
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      - MONGODB_URL=mongodb://admin:MongoRootSecure2024@mongodb:27017/mission_control_v2?authSource=admin&replicaSet=rs0
+      - MONGODB_DB=mission_control_v2
+      - REDIS_URL=redis://mission-redis:6379
+      - DEBUG=false
+    networks:
+      - backend
+    volumes:
+      - ../../platform:/app/platform:ro
+
+  # ---------------------------------------------------------------------------
+  # Frontend
+  # ---------------------------------------------------------------------------
+  frontend:
+    build: ./frontend
+    container_name: mc2-frontend
+    restart: unless-stopped
+    ports:
+      - "4004:80"
+    depends_on:
+      - backend
+    networks:
+      - backend
+
+  # ---------------------------------------------------------------------------
+  # MongoDB (uses existing from root docker-compose if running)
+  # ---------------------------------------------------------------------------
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD:-password}
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - backend
+    profiles:
+      - infra  # Only start with: docker compose --profile infra up -d
+
+  # ---------------------------------------------------------------------------
+  # Redis (uses existing from root docker-compose if running)
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend
+    profiles:
+      - infra  # Only start with: docker compose --profile infra up -d
+
+networks:
+  backend:
+    name: backend
+    external: true
+
+volumes:
+  mongodb_data:
+  redis_data:
+
+# =============================================================================
+# Usage:
+# =============================================================================
+# If infrastructure is already running (from root docker-compose):
+#   docker compose up -d --build
+#
+# If you need to start infrastructure too:
+#   docker compose --profile infra up -d --build
+#
+# Access:
+#   - Frontend: http://localhost:4004
+#   - Backend API: http://localhost:4000
+#   - API Docs: http://localhost:4000/docs
+# =============================================================================

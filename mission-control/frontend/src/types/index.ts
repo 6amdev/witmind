@@ -1,6 +1,7 @@
 // Project types
 export type ProjectType = 'web' | 'api' | 'mobile' | 'marketing' | 'creative'
 export type ProjectStatus = 'draft' | 'planning' | 'in_progress' | 'review' | 'completed' | 'archived'
+export type ExecutionMode = 'full_auto' | 'review_first' | 'manual'
 
 export interface Project {
   id: string
@@ -8,10 +9,18 @@ export interface Project {
   description: string
   type?: ProjectType
   team_id?: string
+  execution_mode: ExecutionMode
   status: ProjectStatus
   progress: number
   created_at: string
   updated_at: string
+  completed_at?: string
+  output_dir?: string
+  preview_url?: string
+  // Git integration
+  git_repo_name?: string
+  git_repo_url?: string
+  git_clone_url?: string
 }
 
 export interface ProjectCreate {
@@ -19,6 +28,7 @@ export interface ProjectCreate {
   description: string
   type?: ProjectType
   team_id?: string
+  execution_mode?: ExecutionMode
 }
 
 // Task types

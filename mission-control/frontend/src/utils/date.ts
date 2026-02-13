@@ -49,3 +49,28 @@ export function formatRelativeTime(dateStr: string): string {
     day: 'numeric',
   })
 }
+
+/**
+ * Format date/time for display (local timezone)
+ */
+export function formatDateTime(dateStr: string): string {
+  const date = parseUTCDate(dateStr)
+  return date.toLocaleString('th-TH', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+/**
+ * Format time only (local timezone)
+ */
+export function formatTime(dateStr: string): string {
+  const date = parseUTCDate(dateStr)
+  return date.toLocaleTimeString('th-TH', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}

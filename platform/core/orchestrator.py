@@ -60,7 +60,7 @@ class Orchestrator:
     """Main orchestration engine for managing AI team workflows"""
 
     def __init__(self, config_path: str = None):
-        self.root_path = Path(os.environ.get('WITMIND_ROOT', '/home/wit/6amdev'))
+        self.root_path = Path(os.environ.get('WITMIND_ROOT', str(Path.home() / 'witmind-data')))
         self.config_path = config_path or self.root_path / 'core' / 'config'
 
         # Load configuration

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import clsx from 'clsx'
 import type { Project } from '../../types'
-import { formatRelativeTime } from '../../utils/date'
+import { formatDateTime } from '../../utils/date'
 
 interface ProjectCardProps {
   project: Project
@@ -68,8 +68,8 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           </span>
         </div>
 
-        <span className="text-text-muted">
-          {formatRelativeTime(project.updated_at)}
+        <span className="text-text-muted text-xs">
+          {formatDateTime(project.created_at)}
         </span>
       </div>
 

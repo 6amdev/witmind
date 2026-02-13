@@ -307,6 +307,6 @@ def get_approval_gate(root_path: str = None) -> ApprovalGate:
     global _approval_gate
     if _approval_gate is None:
         if root_path is None:
-            root_path = os.environ.get('WITMIND_ROOT', '/home/wit/6amdev')
+            root_path = os.environ.get('WITMIND_ROOT', str(Path.home() / 'witmind-data'))
         _approval_gate = ApprovalGate(root_path)
     return _approval_gate

@@ -1,7 +1,16 @@
-import { Link } from 'react-router-dom'
-import { Rocket, Bell, Settings } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Rocket, Bell, Settings, LogOut } from 'lucide-react'
+import { useAuth } from '../../contexts/AuthContext'
 
 export default function Header() {
+  const { logout } = useAuth()
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
+  }
+
   return (
     <header className="h-14 bg-bg-secondary border-b border-border-default px-4 flex items-center justify-between sticky top-0 z-50">
       {/* Logo */}
@@ -29,9 +38,13 @@ export default function Header() {
         <button className="btn-ghost p-2">
           <Settings className="w-5 h-5" />
         </button>
-        <div className="w-8 h-8 rounded-full bg-accent-blue flex items-center justify-center text-white font-medium">
-          U
-        </div>
+        <button
+          onClick={handleLogout}
+          className="btn-ghost p-2 text-text-muted hover:text-accent-red"
+          title="Logout"
+        >
+          <LogOut className="w-5 h-5" />
+        </button>
       </div>
     </header>
   )

@@ -544,6 +544,6 @@ def get_execution_engine(root_path: str = None) -> ExecutionEngine:
     global _execution_engine
     if _execution_engine is None:
         if root_path is None:
-            root_path = os.environ.get('WITMIND_ROOT', '/home/wit/6amdev')
+            root_path = os.environ.get('WITMIND_ROOT', str(Path.home() / 'witmind-data'))
         _execution_engine = ExecutionEngine(root_path)
     return _execution_engine

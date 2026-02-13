@@ -66,7 +66,7 @@ class TaskQueue:
             logger.info("Connected to Redis")
         except Exception as e:
             logger.warning(f"Redis not available, using file-based queue: {e}")
-            self.queue_path = os.environ.get('WITMIND_ROOT', '/home/wit/6amdev') + '/logs/queue'
+            self.queue_path = os.path.join(os.environ.get('WITMIND_ROOT', str(Path.home() / 'witmind-data')), 'logs/queue')
             os.makedirs(self.queue_path, exist_ok=True)
 
         self.handlers: Dict[str, Callable] = {}

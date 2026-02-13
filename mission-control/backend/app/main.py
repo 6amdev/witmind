@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 
 from .config import settings
 from .database import connect_db, disconnect_db
-from .routes import projects_router, tasks_router, agents_router, activities_router, approvals_router
+from .routes import projects_router, tasks_router, agents_router, activities_router, approvals_router, events_router, auth_router, gitea_router
 
 
 # Socket.io server
@@ -48,11 +48,14 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(auth_router)
 app.include_router(projects_router)
 app.include_router(tasks_router)
 app.include_router(agents_router)
 app.include_router(activities_router)
 app.include_router(approvals_router)
+app.include_router(events_router)
+app.include_router(gitea_router)
 
 
 # Health check

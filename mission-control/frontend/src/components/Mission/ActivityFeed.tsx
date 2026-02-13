@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useMemo, useEffect, useRef, useState } from 'react'
 import {
   Play,
   CheckCircle2,
@@ -6,9 +7,11 @@ import {
   FileCode,
   ExternalLink,
   RefreshCw,
-  Clock
+  Clock,
+  Radio
 } from 'lucide-react'
 import { activitiesApi } from '../../services/api'
+import { useProjectStore } from '../../stores/projectStore'
 import type { Activity } from '../../types'
 import clsx from 'clsx'
 import { parseUTCDate } from '../../utils/date'
@@ -70,12 +73,24 @@ function formatDuration(ms: number): string {
   return `${Math.floor(ms / 60000)}m ${Math.floor((ms % 60000) / 1000)}s`
 }
 
-function ActivityItem({ activity }: { activity: Activity }) {
+function ActivityItem({ activity, isNew }: { activity: Activity; isNew?: boolean }) {
   const config = activityConfig[activity.type] || activityConfig.agent_progress
   const Icon = config.icon
+  const [showHighlight, setShowHighlight] = useState(isNew)
+
+  // Remove highlight after animation
+  useEffect(() => {
+    if (isNew) {
+      const timer = setTimeout(() => setShowHighlight(false), 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [isNew])
 
   return (
-    <div className="flex gap-3 py-3 border-b border-border-muted last:border-0">
+    <div className={clsx(
+      'flex gap-3 py-3 border-b border-border-muted last:border-0 transition-all duration-500',
+      showHighlight && 'bg-accent-blue/10 animate-pulse rounded-lg -mx-2 px-2'
+    )}>
       {/* Icon */}
       <div className={clsx(
         'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0',
@@ -158,24 +173,69 @@ export default function ActivityFeed({
   limit = 20,
   showHeader = true
 }: ActivityFeedProps) {
-  const { data: activities = [], isLoading, refetch, isFetching } = useQuery({
+  const { recentActivities, activeAgent } = useProjectStore()
+  const seenIdsRef = useRef<Set<string>>(new Set())
+  const [newIds, setNewIds] = useState<Set<string>>(new Set())
+
+  const { data: apiActivities = [], isLoading, refetch, isFetching } = useQuery({
     queryKey: ['activities', projectId, limit],
     queryFn: () => projectId
       ? activitiesApi.listByProject(projectId)
       : activitiesApi.listRecent(limit),
-    refetchInterval: 5000,  // Poll every 5 seconds
+    refetchInterval: 10000,  // Poll less frequently since we have real-time
   })
 
-  // Filter to only agent activities if showing all
-  const agentActivities = activities.filter(a =>
+  // Merge API activities with real-time activities from store
+  const allActivities = useMemo(() => {
+    const apiIds = new Set(apiActivities.map(a => a.id))
+    // Add real-time activities that aren't already from API
+    const realTimeOnly = recentActivities.filter(a =>
+      !apiIds.has(a.id) && (!projectId || a.project_id === projectId)
+    )
+    return [...realTimeOnly, ...apiActivities]
+  }, [apiActivities, recentActivities, projectId])
+
+  // Filter to only agent activities
+  const agentActivities = allActivities.filter(a =>
     a.type.startsWith('agent_')
   )
+
+  // Track new activities for highlighting
+  useEffect(() => {
+    const currentIds = new Set(agentActivities.map(a => a.id))
+    const newOnes = new Set<string>()
+    currentIds.forEach(id => {
+      if (!seenIdsRef.current.has(id)) {
+        newOnes.add(id)
+      }
+    })
+    if (newOnes.size > 0) {
+      setNewIds(newOnes)
+      // Clear new markers after animation
+      const timer = setTimeout(() => {
+        seenIdsRef.current = currentIds
+        setNewIds(new Set())
+      }, 2000)
+      return () => clearTimeout(timer)
+    }
+    seenIdsRef.current = currentIds
+  }, [agentActivities])
+
+  const isLive = !!activeAgent
 
   return (
     <div className="flex flex-col h-full">
       {showHeader && (
         <div className="flex items-center justify-between px-4 py-3 border-b border-border-default">
-          <h3 className="font-semibold text-sm">Agent Activity</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-sm">Agent Activity</h3>
+            {isLive && (
+              <span className="flex items-center gap-1 text-xs bg-accent-green/20 text-accent-green px-2 py-0.5 rounded-full">
+                <Radio className="w-3 h-3 animate-pulse" />
+                Live
+              </span>
+            )}
+          </div>
           <button
             onClick={() => refetch()}
             className="btn-ghost p-1 text-text-muted hover:text-text-primary"
@@ -200,7 +260,11 @@ export default function ActivityFeed({
           </div>
         ) : (
           agentActivities.map((activity) => (
-            <ActivityItem key={activity.id} activity={activity} />
+            <ActivityItem
+              key={activity.id}
+              activity={activity}
+              isNew={newIds.has(activity.id)}
+            />
           ))
         )}
       </div>

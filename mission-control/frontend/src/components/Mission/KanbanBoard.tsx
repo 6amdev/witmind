@@ -13,7 +13,7 @@ import {
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Play, CheckCircle, Loader2, ListChecks, X, Rocket } from 'lucide-react'
-import { tasksApi, projectsApi } from '../../services/api'
+import { tasksApi, projectsApi, platformAgentsApi } from '../../services/api'
 import KanbanColumn from './KanbanColumn'
 import TaskCard from './TaskCard'
 import TaskModal from './TaskModal'
@@ -114,12 +114,17 @@ export default function KanbanBoard({ projectId, tasks, isLoading, projectStatus
         await projectsApi.update(projectId, { status: 'in_progress' })
       }
 
-      // Run each selected task via Platform API
+      // Dispatch tasks to Platform API for AI agent execution
       const taskIdsArray = Array.from(selectedTaskIds)
-      for (const taskId of taskIdsArray) {
-        const task = tasks.find(t => t.id === taskId)
-        if (task) {
-          // Move task to "working" status
+
+      try {
+        // Send all tasks to Platform API
+        await platformAgentsApi.runTasks(taskIdsArray)
+        console.log(`Dispatched ${taskIdsArray.length} tasks to Platform API`)
+      } catch (platformError) {
+        console.warn('Platform API not available, moving tasks manually:', platformError)
+        // Fallback: just move tasks to working status
+        for (const taskId of taskIdsArray) {
           await tasksApi.move(taskId, { status: 'working' })
         }
       }

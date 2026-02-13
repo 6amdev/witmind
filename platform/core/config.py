@@ -48,7 +48,7 @@ class StorageConfig:
     ai_models_path: Path = field(default_factory=lambda: Path(os.getenv("AI_MODELS_PATH", "/mnt/data/ai-models")))
     backup_path: Path = field(default_factory=lambda: Path(os.getenv("BACKUP_PATH", "/mnt/data/backups")))
     projects_path: Path = field(default_factory=lambda: Path(os.getenv("PROJECTS_PATH", "/mnt/data/projects")))
-    log_path: Path = field(default_factory=lambda: Path(os.getenv("LOG_PATH", "/var/log/6amdev")))
+    log_path: Path = field(default_factory=lambda: Path(os.getenv("LOG_PATH", str(Path.home() / "witmind-data" / "logs"))))
 
     def ensure_directories(self):
         """Create storage directories if they don't exist"""

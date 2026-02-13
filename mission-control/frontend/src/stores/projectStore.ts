@@ -1,10 +1,17 @@
 import { create } from 'zustand'
-import type { Project, Task } from '../types'
+import type { Project, Task, Activity } from '../types'
+
+interface AgentStatus {
+  agentId: string
+  status: 'standby' | 'working' | 'error'
+  taskId?: string
+  output?: string
+}
 
 interface ProjectState {
   // Current project
   currentProject: Project | null
-  setCurrentProject: (project: Project | null) => void
+  setCurrentProject: (project: Project | Partial<Project> | null) => void
 
   // Tasks grouped by status
   tasks: Task[]
@@ -16,12 +23,26 @@ interface ProjectState {
   // UI state
   selectedTaskId: string | null
   setSelectedTaskId: (id: string | null) => void
+
+  // Real-time agent state
+  activeAgent: AgentStatus | null
+  setActiveAgent: (agent: AgentStatus | null) => void
+  agentOutput: string
+  appendAgentOutput: (output: string) => void
+  clearAgentOutput: () => void
+
+  // Recent activities (for live updates)
+  recentActivities: Activity[]
+  addActivity: (activity: Activity) => void
+  setActivities: (activities: Activity[]) => void
 }
 
 export const useProjectStore = create<ProjectState>((set) => ({
   // Current project
   currentProject: null,
-  setCurrentProject: (project) => set({ currentProject: project }),
+  setCurrentProject: (project) => set((state) => ({
+    currentProject: project ? { ...state.currentProject, ...project } as Project : null
+  })),
 
   // Tasks
   tasks: [],
@@ -32,7 +53,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
     })),
   updateTask: (task) =>
     set((state) => ({
-      tasks: state.tasks.map((t) => (t.id === task.id ? task : t)),
+      tasks: state.tasks.map((t) => (t.id === task.id ? { ...t, ...task } : t)),
     })),
   removeTask: (taskId) =>
     set((state) => ({
@@ -42,4 +63,20 @@ export const useProjectStore = create<ProjectState>((set) => ({
   // UI state
   selectedTaskId: null,
   setSelectedTaskId: (id) => set({ selectedTaskId: id }),
+
+  // Real-time agent state
+  activeAgent: null,
+  setActiveAgent: (agent) => set({ activeAgent: agent }),
+  agentOutput: '',
+  appendAgentOutput: (output) => set((state) => ({
+    agentOutput: state.agentOutput + output
+  })),
+  clearAgentOutput: () => set({ agentOutput: '' }),
+
+  // Recent activities
+  recentActivities: [],
+  addActivity: (activity) => set((state) => ({
+    recentActivities: [activity, ...state.recentActivities].slice(0, 50)
+  })),
+  setActivities: (activities) => set({ recentActivities: activities }),
 }))
